@@ -34,6 +34,7 @@ public class Consulta implements Agendavel {
         this.status = "agendada";
     }
 
+    // Sobrecarga
     public void agendar(String data, String horario) {
         this.data = data;
         this.horario = horario;
@@ -42,10 +43,20 @@ public class Consulta implements Agendavel {
 
     @Override
     public void cancelar() {
-        this.status = "cancelada";
+        if (status.equals("realizada")) {
+            System.out.println("Não é possível cancelar uma consulta já realizada.");
+            return;
+        }
+
+        if (status.equals("cancelada")) {
+            System.out.println("A consulta já está cancelada.");
+            return;
+        }
+
+        status = "cancelada";
     }
 
-// Sobrecarga do método cancelar
+    // Sobrecarga
     public String cancelar(String motivo) {
         cancelar();
         return "Consulta cancelada. Motivo: " + motivo;
@@ -53,17 +64,35 @@ public class Consulta implements Agendavel {
 
     @Override
     public void remarcar() {
-        this.status = "remarcada";
+        if (!status.equals("agendada")) {
+            System.out.println("Apenas consultas agendadas podem ser remarcadas.");
+            return;
+        }
+
+        status = "remarcada";
     }
 
+    // Sobrecarga
     public void remarcar(String novaData, String novoHorario) {
+
+        if (!status.equals("agendada")) {
+            System.out.println("Apenas consultas agendadas podem ser remarcadas.");
+            return;
+        }
+
         this.data = novaData;
         this.horario = novoHorario;
         this.status = "remarcada";
     }
 
     public void realizar() {
-        this.status = "realizada";
+
+        if (!status.equals("agendada")) {
+            System.out.println("Apenas consultas agendadas podem ser realizadas.");
+            return;
+        }
+
+        status = "realizada";
     }
 
     public String exibirResumo() {
