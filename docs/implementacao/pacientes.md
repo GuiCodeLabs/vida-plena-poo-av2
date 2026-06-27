@@ -37,11 +37,11 @@ Documentar a parte de pacientes da arquitetura final da AV2 do VidaPlena. Esta f
 
 ## Diagrama
 
-![Pacientes, Pessoa e Convênio](../Diagramas/pacientes-pessoa-convenio.png)
+![Pacientes, Pessoa e Convênio](../diagramas/pacientes-pessoa-convenio.png)
 
-Arquivo esperado: `docs/Diagramas/pacientes-pessoa-convenio.png`.
+Arquivo do diagrama: `docs/diagramas/pacientes-pessoa-convenio.png`.
 
-Enquanto o PNG não for exportado, o bloco Mermaid abaixo é a fonte oficial do diagrama.
+O PNG acima foi gerado a partir do Mermaid abaixo.
 
 ## Código Mermaid
 
