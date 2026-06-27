@@ -11,7 +11,7 @@ public class Consulta implements Agendavel {
         this(cpfPaciente, nomeProfissional, data, horario, "inicial");
     }
 
-    public Consulta(String cpfPaciente, String nomeProfissional, String data,String horario, String tipo) {
+    public Consulta(String cpfPaciente, String nomeProfissional, String data, String horario, String tipo) {
         this.cpfPaciente = cpfPaciente;
         this.nomeProfissional = nomeProfissional;
         this.data = data;
@@ -20,8 +20,7 @@ public class Consulta implements Agendavel {
         this.status = "agendada";
     }
 
-
-    public Consulta(String cpfPaciente, String nomeProfissional,String data, String horario,String tipo, String status) {
+    public Consulta(String cpfPaciente, String nomeProfissional, String data, String horario, String tipo, String status) {
         this.cpfPaciente = cpfPaciente;
         this.nomeProfissional = nomeProfissional;
         this.data = data;
@@ -35,10 +34,17 @@ public class Consulta implements Agendavel {
         this.status = "agendada";
     }
 
+    public void agendar(String data, String horario) {
+        this.data = data;
+        this.horario = horario;
+        this.status = "agendada";
+    }
+
     @Override
     public void cancelar() {
         this.status = "cancelada";
     }
+
 // Sobrecarga do método cancelar
     public String cancelar(String motivo) {
         cancelar();
@@ -47,6 +53,12 @@ public class Consulta implements Agendavel {
 
     @Override
     public void remarcar() {
+        this.status = "remarcada";
+    }
+
+    public void remarcar(String novaData, String novoHorario) {
+        this.data = novaData;
+        this.horario = novoHorario;
         this.status = "remarcada";
     }
 
