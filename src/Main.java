@@ -399,92 +399,46 @@ public class Main {
 
 // Coleta os dados informados pelo usuário e delega as validações e o agendamento ao ClinicaServico.
 public static void agendarComProfissional() {
-
     System.out.print("CPF: ");
     String cpf = sc.nextLine();
 
     System.out.print("Profissional: ");
     String nome = sc.nextLine();
 
-    System.out.print("Data: ");
+    System.out.print("Data (DD/MM/AAAA): ");
     String data = sc.nextLine();
 
-    System.out.print("Horário: ");
+    System.out.print("Horario (HH:MM): ");
     String horario = sc.nextLine();
 
-    System.out.print("Tipo: ");
+    System.out.print("Tipo (pressione Enter para vazio): ");
     String tipo = sc.nextLine();
 
     String diaSemana = descobrirDiaSemana(data);
 
     try {
-
-        ClinicaServico.agendarConsultaPorProfissional(
-            consultas,
-            pacientes,
-            totalPacientes,
-            profissionais,
-            totalProfissionais,
-            cpf,
-            nome,
-            data,
-            horario,
-            tipo,
-            diaSemana
-        );
-
-        System.out.println("Consulta agendada.");
-
-    } catch (Exception e) {
-
-        System.out.println(e.getMessage());
-
+        servico.agendarConsultaPorProfissional(consultas, profissionais, totalProfissionais,
+                cpf, nome, data, horario, tipo, diaSemana);
+        System.out.println("Consulta agendada com sucesso!");
     }
 }
 
 // Realiza o agendamento buscando automaticamente um profissional da especialidade informada.
 public static void agendarPorEspecialidade() {
+    System.out.print("CPF do paciente: ");
+    String cpf = sc.nextLine();
+    System.out.print("Especialidade: ");
+    String especialidade = sc.nextLine();
+    System.out.print("Data (DD/MM/AAAA): ");
+    String data = sc.nextLine();
+    System.out.print("Horario (HH:MM): ");
+    String horario = sc.nextLine();
+    String diaSemana = descobrirDiaSemana(data);
+
     try {
-        System.out.print("CPF do paciente: ");
-        String cpf = sc.nextLine();
-        try {
-            servico.buscarPacienteAtivo(cpf);
-        } catch (PacienteNaoEncontradoException e) {
-            System.out.println(e.getMessage());
-            return;
-        } catch (PacienteInativoException e) {
-            System.out.println(e.getMessage());
-            return;
-
-        System.out.print("Especialidade: ");
-        String especialidade = sc.nextLine();
-
-        System.out.print("Data (DD/MM/AAAA): ");
-        String data = sc.nextLine();
-
-        System.out.print("Horario (HH:MM): ");
-        String horario = sc.nextLine();
-
-        String diaSemana = descobrirDiaSemana(data);
-
-        ClinicaServico.agendarConsultaPorEspecialidade(
-                consultas,
-                pacientes,
-                totalPacientes,
-                profissionais,
-                totalProfissionais,
-                cpf,
-                especialidade,
-                data,
-                horario,
-                diaSemana
-        );
-
+        servico.agendarConsultaPorEspecialidade(consultas, profissionais, totalProfissionais,
+                cpf, especialidade, data, horario, diaSemana);
         System.out.println("Consulta agendada por especialidade com sucesso!");
-
-    } catch (ConsultaNaoEncontradaException |
-            PacienteInativoException |
-            HorarioIndisponivelException e) {
         System.out.println(e.getMessage());
     } finally {
         System.out.println("Operação de agendamento por especialidade finalizada.");
@@ -493,41 +447,25 @@ public static void agendarPorEspecialidade() {
 
 // Recebe os dados da consulta e solicita ao serviço o cancelamento da consulta.
 public static void cancelarConsulta() {
+    System.out.print("CPF: ");
+    String cpf = sc.nextLine();
+    System.out.print("Data (DD/MM/AAAA): ");
+    String data = sc.nextLine();
+    System.out.print("Horario (HH:MM): ");
+    String horario = sc.nextLine();
+    System.out.print("Informar motivo? (1-Nao / 2-Sim): ");
+    int temMotivo = Integer.parseInt(sc.nextLine());
+    String motivo = "";
+    if (temMotivo == 2) {
+        System.out.print("Motivo: ");
+        motivo = sc.nextLine();
+    }
+
     try {
-        System.out.print("CPF: ");
-        String cpf = sc.nextLine();
-
-        System.out.print("Data (DD/MM/AAAA): ");
-        String data = sc.nextLine();
-
-        System.out.print("Horario (HH:MM): ");
-        String horario = sc.nextLine();
-
-        System.out.print("Informar motivo? (1-Nao / 2-Sim): ");
-        int temMotivo = Integer.parseInt(sc.nextLine());
-
-        String motivo = "";
-
-        if (temMotivo == 2) {
-            System.out.print("Motivo: ");
-            motivo = sc.nextLine();
-        }
-
-        ClinicaServico.cancelarConsulta(
-                consultas,
-                cpf,
-                data,
-                horario,
-                motivo
-        );
-
+        servico.cancelarConsulta(consultas, cpf, data, horario, motivo);
         System.out.println("Consulta cancelada com sucesso.");
-
-    } catch (ConsultaNaoEncontradaException |
-            OperacaoInvalidaException e) {
+    } catch (Exception e) {
         System.out.println(e.getMessage());
-    } catch (NumberFormatException e) {
-        System.out.println("Entrada numérica inválida.");
     } finally {
         System.out.println("Operação de cancelamento finalizada.");
     }
@@ -535,44 +473,24 @@ public static void cancelarConsulta() {
 
 // Coleta os novos dados da consulta e delega ao serviço a validação da remarcação.
 public static void remarcarConsulta() {
+    System.out.print("CPF: ");
+    String cpf = sc.nextLine();
+    System.out.print("Data original (DD/MM/AAAA): ");
+    String dataOrig = sc.nextLine();
+    System.out.print("Horario original (HH:MM): ");
+    String horarioOrig = sc.nextLine();
+    System.out.print("Nova data (DD/MM/AAAA): ");
+    String novaData = sc.nextLine();
+    System.out.print("Novo horario (HH:MM): ");
+    String novoHorario = sc.nextLine();
+    String diaSemana = descobrirDiaSemana(novaData);
+
     try {
-        System.out.print("CPF: ");
-        String cpf = sc.nextLine();
-
-        System.out.print("Data original (DD/MM/AAAA): ");
-        String dataOrig = sc.nextLine();
-
-        System.out.print("Horario original (HH:MM): ");
-        String horarioOrig = sc.nextLine();
-
-        System.out.print("Nova data (DD/MM/AAAA): ");
-        String novaData = sc.nextLine();
-
-        System.out.print("Novo horario (HH:MM): ");
-        String novoHorario = sc.nextLine();
-
-        String diaSemana = descobrirDiaSemana(novaData);
-
-        ClinicaServico.remarcarConsulta(
-                consultas,
-                profissionais,
-                totalProfissionais,
-                cpf,
-                dataOrig,
-                horarioOrig,
-                novaData,
-                novoHorario,
-                diaSemana
-        );
-
+        servico.remarcarConsulta(consultas, profissionais, totalProfissionais,
+                cpf, dataOrig, horarioOrig, novaData, novoHorario, diaSemana);
         System.out.println("Consulta remarcada com sucesso!");
-
-    } catch (ConsultaNaoEncontradaException |
-            HorarioIndisponivelException |
-            OperacaoInvalidaException e) {
+    } catch (Exception e) {
         System.out.println(e.getMessage());
-    } catch (NumberFormatException e) {
-        System.out.println("Entrada numérica inválida.");
     } finally {
         System.out.println("Operação de remarcação finalizada.");
     }

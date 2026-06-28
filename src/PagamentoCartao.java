@@ -1,4 +1,7 @@
 public class PagamentoCartao extends Pagamento {
+    public PagamentoCartao() {
+        super(0, 0.0, "cartao");
+    }
 
     // SOBRECARGA 1/2: construtor com 4 parametros.
     // Usado no pagamento DIRETO: recebe o valor base e ainda precisa validar
