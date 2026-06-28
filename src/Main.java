@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Main {
     static Paciente[] pacientes = new Paciente[100];
@@ -20,6 +21,26 @@ public class Main {
     static int totalMultas = 0;
 
     static Scanner sc = new Scanner(System.in);
+
+    static ArrayList<Convenio> conveniosCadastrados = criarConveniosTeste();
+
+    static ArrayList<Convenio> criarConveniosTeste() {
+        ArrayList<Convenio> lista = new ArrayList<Convenio>();
+        lista.add(new Convenio("UnimedTeste", 60,
+            new String[]{"clinica geral", "psicologia"}));
+        lista.add(new Convenio("BradescoSaudeTeste", 40,
+            new String[]{"fisioterapia", "nutricao"}));
+        return lista;
+    }
+
+    static Convenio buscarConvenioPorNome(String nomeConvenio) {
+        for (int i = 0; i < conveniosCadastrados.size(); i++) {
+            if (conveniosCadastrados.get(i).getNome().equalsIgnoreCase(nomeConvenio)) {
+                return conveniosCadastrados.get(i);
+            }
+        }
+        return null;
+    }
 
     public static void main(String[] args) {
         int opcao = -1;
@@ -752,7 +773,7 @@ public class Main {
         }
     }
 
-    public static void pagamentoDireto() {
+   public static void pagamentoDireto() {
         System.out.print("Indice da consulta: ");
         int idxConsulta = Integer.parseInt(sc.nextLine());
 
@@ -779,6 +800,22 @@ public class Main {
                 totalPagamentos++;
                 System.out.println("Pagamento registrado!");
             } catch (PagamentoInvalidoException e) {
+                System.out.println("Erro no pagamento: " + e.getMessage());
+            }
+        } else if (tipoPag.equals("convenio")) {
+            System.out.print("Nome do convenio: ");
+            String nomeConvenio = sc.nextLine();
+            Convenio convenio = buscarConvenioPorNome(nomeConvenio);
+
+            String nomeProfConsulta = consultas[idxConsulta].nomeProfissional;
+            int idxProfConsulta = buscarIndiceProfissional(nomeProfConsulta);
+            String especialidade = profissionais[idxProfConsulta].especialidade;
+
+            try {
+                pagamentos[totalPagamentos] = new PagamentoConvenio(idxConsulta, valor, tipoPag, convenio, especialidade);
+                totalPagamentos++;
+                System.out.println("Pagamento registrado!");
+            } catch (ConvenioNaoCobreException e) {
                 System.out.println("Erro no pagamento: " + e.getMessage());
             }
         } else {
@@ -845,6 +882,17 @@ public class Main {
                 totalPagamentos++;
                 System.out.println("Pagamento registrado!");
             } catch (PagamentoInvalidoException e) {
+                System.out.println("Erro no pagamento: " + e.getMessage());
+            }
+        } else if (tipoPag.equals("convenio")) {
+            Convenio convenio = buscarConvenioPorNome(pacientes[idxPac].convenioNome);
+            String especialidade = profissionais[idxProf].especialidade;
+
+            try {
+                pagamentos[totalPagamentos] = new PagamentoConvenio(idxConsulta, valorBase, tipoPag, convenio, especialidade);
+                totalPagamentos++;
+                System.out.println("Pagamento registrado!");
+            } catch (ConvenioNaoCobreException e) {
                 System.out.println("Erro no pagamento: " + e.getMessage());
             }
         } else {
