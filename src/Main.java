@@ -335,101 +335,59 @@ public class Main {
         }
     }
 
+// Coleta os dados informados pelo usuário e delega as validações e o agendamento ao ClinicaServico.
 public static void agendarComProfissional() {
+
+    System.out.print("CPF: ");
+    String cpf = sc.nextLine();
+
+    System.out.print("Profissional: ");
+    String nome = sc.nextLine();
+
+    System.out.print("Data: ");
+    String data = sc.nextLine();
+
+    System.out.print("Horário: ");
+    String horario = sc.nextLine();
+
+    System.out.print("Tipo: ");
+    String tipo = sc.nextLine();
+
+    String diaSemana = descobrirDiaSemana(data);
+
     try {
-        System.out.print("CPF do paciente: ");
-        String cpf = sc.nextLine();
 
-        int idxPac = buscarIndicePaciente(cpf);
-        if (idxPac == -1) {
-            throw new ConsultaNaoEncontradaException("Paciente não encontrado para agendamento.");
-        }
+        ClinicaServico.agendarConsultaPorProfissional(
+            consultas,
+            pacientes,
+            totalPacientes,
+            profissionais,
+            totalProfissionais,
+            cpf,
+            nome,
+            data,
+            horario,
+            tipo,
+            diaSemana
+        );
 
-        if (!pacientes[idxPac].ativo) {
-            throw new OperacaoInvalidaException("Paciente inativo. Não é possível agendar consulta.");
-        }
+        System.out.println("Consulta agendada.");
 
-        System.out.print("Nome do profissional: ");
-        String nomeProf = sc.nextLine();
+    } catch (Exception e) {
 
-        int idxProf = buscarIndiceProfissional(nomeProf);
-        if (idxProf == -1) {
-            throw new ConsultaNaoEncontradaException("Profissional não encontrado.");
-        }
-
-        if (profissionais[idxProf].valorConsulta == 0) {
-            throw new OperacaoInvalidaException("Profissional sem valor definido. Não pode agendar.");
-        }
-
-        System.out.print("Data (DD/MM/AAAA): ");
-        String data = sc.nextLine();
-
-        System.out.print("Horario (HH:MM): ");
-        String horario = sc.nextLine();
-
-        String diaSemana = descobrirDiaSemana(data);
-
-        if (!profissionais[idxProf].atendeNoDia(diaSemana)) {
-            throw new HorarioIndisponivelException("Profissional não atende nesse dia.");
-        }
-
-        if (temConflito(nomeProf, data, horario)) {
-            System.out.println("Horário ocupado!");
-
-            String sugestao = sugerirHorario(nomeProf, data);
-            if (sugestao.equals("")) {
-                throw new HorarioIndisponivelException("Nenhum horário disponível nesse dia.");
-            }
-
-            System.out.println("Sugestão: " + sugestao);
-            System.out.print("Aceita? (1-Sim / 2-Nao): ");
-            int aceita = Integer.parseInt(sc.nextLine());
-
-            if (aceita == 1) {
-                horario = sugestao;
-            } else {
-                throw new HorarioIndisponivelException("Agendamento cancelado por conflito de horário.");
-            }
-        }
-
-        System.out.print("Informar tipo? (1-Nao / 2-Sim): ");
-        int infoTipo = Integer.parseInt(sc.nextLine());
-
-        if (infoTipo == 1) {
-            consultas.add(new Consulta(cpf, nomeProf, data, horario));
-        } else {
-            System.out.print("Tipo (inicial/retorno/avaliacao): ");
-            String tipo = sc.nextLine();
-            consultas.add(new Consulta(cpf, nomeProf, data, horario, tipo));
-        }
-
-        System.out.println("Consulta agendada com sucesso!");
-
-    } catch (ConsultaNaoEncontradaException | HorarioIndisponivelException | OperacaoInvalidaException e) {
         System.out.println(e.getMessage());
-    } catch (NumberFormatException e) {
-        System.out.println("Entrada numérica inválida.");
-    } finally {
-        System.out.println("Operação de agendamento finalizada.");
+
     }
 }
 
+// Realiza o agendamento buscando automaticamente um profissional da especialidade informada.
 public static void agendarPorEspecialidade() {
     try {
         System.out.print("CPF do paciente: ");
         String cpf = sc.nextLine();
 
-        int idxPac = buscarIndicePaciente(cpf);
-        if (idxPac == -1) {
-            throw new ConsultaNaoEncontradaException("Paciente não encontrado para agendamento.");
-        }
-
-        if (!pacientes[idxPac].ativo) {
-            throw new OperacaoInvalidaException("Paciente inativo. Não é possível agendar consulta.");
-        }
-
         System.out.print("Especialidade: ");
-        String esp = sc.nextLine();
+        String especialidade = sc.nextLine();
 
         System.out.print("Data (DD/MM/AAAA): ");
         String data = sc.nextLine();
