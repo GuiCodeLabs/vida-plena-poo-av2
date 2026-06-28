@@ -113,7 +113,8 @@ public class Main {
             String tel = sc.nextLine();
             System.out.print("Convenio: ");
             String conv = sc.nextLine();
-            paciente = new Paciente(nome, cpf, idade.intValue(), tel, conv);
+            Convenio convenio = criarConvenio(conv);
+            paciente = new Paciente(nome, cpf, idade.intValue(), tel, convenio);
         } else {
             System.out.println("Tipo de cadastro invalido.");
             return;
@@ -153,7 +154,8 @@ public class Main {
         } else if (tipo.intValue() == 2) {
             System.out.print("Convenio: ");
             String conv = sc.nextLine();
-            atualizado = servico.complementarPaciente(cpf, idade.intValue(), tel, conv);
+            Convenio convenio = criarConvenio(conv);
+            atualizado = servico.complementarPaciente(cpf, idade.intValue(), tel, convenio);
         } else {
             System.out.println("Tipo de complementacao invalido.");
             return;
@@ -222,6 +224,13 @@ public class Main {
             System.out.println("Valor numerico invalido.");
             return null;
         }
+    }
+
+    public static Convenio criarConvenio(String nomeConvenio) {
+        if (nomeConvenio == null || nomeConvenio.trim().equals("")) {
+            return null;
+        }
+        return new Convenio(nomeConvenio, 0);
     }
 
     // ---- PROFISSIONAIS ----
