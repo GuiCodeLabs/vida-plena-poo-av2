@@ -11,10 +11,10 @@ public class Prontuario {
     }
 
     public Prontuario(String observacoes, String diagnostico, String dataRegistro) {
-        this.observacoes = observacoes;
-        this.diagnostico = diagnostico;
-        this.dataRegistro = dataRegistro;
         this.procedimentosRealizados = new ArrayList<String>();
+        setObservacoes(observacoes);
+        setDiagnostico(diagnostico);
+        setDataRegistro(dataRegistro);
     }
 
     public String getObservacoes() {
@@ -22,7 +22,11 @@ public class Prontuario {
     }
 
     public void setObservacoes(String observacoes) {
-        this.observacoes = observacoes;
+        if (observacoes == null) {
+            this.observacoes = "";
+        } else {
+            this.observacoes = observacoes.trim();
+        }
     }
 
     public String getDiagnostico() {
@@ -30,7 +34,11 @@ public class Prontuario {
     }
 
     public void setDiagnostico(String diagnostico) {
-        this.diagnostico = diagnostico;
+        if (diagnostico == null) {
+            this.diagnostico = "";
+        } else {
+            this.diagnostico = diagnostico.trim();
+        }
     }
 
     public ArrayList<String> getProcedimentosRealizados() {
@@ -46,6 +54,10 @@ public class Prontuario {
     }
 
     public void setDataRegistro(String dataRegistro) {
-        this.dataRegistro = dataRegistro;
+        if (dataRegistro == null) {
+            this.dataRegistro = "";
+        } else {
+            this.dataRegistro = dataRegistro.trim();
+        }
     }
 }
