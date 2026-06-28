@@ -4,6 +4,7 @@ public class Atendimento {
     public String diagnostico;
     public String[] procedimentos;
     public int totalProcedimentos;
+    private Consulta consulta;
     private Prontuario prontuario;
 
     public Atendimento(int indiceConsulta, String observacoes) {
@@ -37,6 +38,22 @@ public class Atendimento {
         }
     }
 
+    public Atendimento(Consulta consulta, String observacoes) {
+        this(0, observacoes);
+        this.consulta = consulta;
+    }
+
+    public Atendimento(Consulta consulta, String observacoes, String diagnostico) {
+        this(0, observacoes, diagnostico);
+        this.consulta = consulta;
+    }
+
+    public Atendimento(Consulta consulta, String observacoes, String diagnostico,
+                       String[] procedimentos, int totalProcedimentos) {
+        this(0, observacoes, diagnostico, procedimentos, totalProcedimentos);
+        this.consulta = consulta;
+    }
+
     public void adicionarProcedimento(String procedimento) {
         if (totalProcedimentos < 10) {
             procedimentos[totalProcedimentos] = procedimento;
@@ -55,6 +72,10 @@ public class Atendimento {
 
     public Prontuario getProntuario() {
         return prontuario;
+    }
+
+    public Consulta getConsulta() {
+        return consulta;
     }
 
     public String exibirResumo() {
