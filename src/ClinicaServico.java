@@ -1,10 +1,13 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class ClinicaServico {
-    private Profissional[] profissionais;
-    private int totalProfissionais;
+    private ArrayList<Profissional> profissionais;
+    private HashMap<String, Profissional> profissionaisPorNome;
 
     public ClinicaServico() {
-        profissionais = new Profissional[50];
-        totalProfissionais = 0;
+        profissionais = new ArrayList<>();
+        profissionaisPorNome = new HashMap<>();
     }
 
     public boolean especialidadeAceita(String especialidade) {
@@ -37,12 +40,12 @@ public class ClinicaServico {
         if (!especialidadeAceita(profissional.getEspecialidade())) {
             return false;
         }
-        if (totalProfissionais >= profissionais.length) {
+        if (profissionaisPorNome.containsKey(profissional.nome)) {
             return false;
         }
 
-        profissionais[totalProfissionais] = profissional;
-        totalProfissionais++;
+        profissionais.add(profissional);
+        profissionaisPorNome.put(profissional.nome, profissional);
         return true;
     }
 
@@ -68,36 +71,18 @@ public class ClinicaServico {
     }
 
     public Profissional buscarProfissionalPorNome(String nome) {
-        for (int i = 0; i < totalProfissionais; i++) {
-            if (profissionais[i].nome.equals(nome)) {
-                return profissionais[i];
-            }
-        }
-        return null;
+        return profissionaisPorNome.get(nome);
     }
 
-    public Profissional[] listarProfissionais() {
-        Profissional[] lista = new Profissional[totalProfissionais];
-        for (int i = 0; i < totalProfissionais; i++) {
-            lista[i] = profissionais[i];
-        }
-        return lista;
+    public ArrayList<Profissional> listarProfissionais() {
+        return new ArrayList<>(profissionais);
     }
 
-    public Profissional[] filtrarProfissionaisPorEspecialidade(String especialidade) {
-        int quantidade = 0;
-        for (int i = 0; i < totalProfissionais; i++) {
-            if (profissionais[i].getEspecialidade().equals(especialidade)) {
-                quantidade++;
-            }
-        }
-
-        Profissional[] filtrados = new Profissional[quantidade];
-        int posicao = 0;
-        for (int i = 0; i < totalProfissionais; i++) {
-            if (profissionais[i].getEspecialidade().equals(especialidade)) {
-                filtrados[posicao] = profissionais[i];
-                posicao++;
+    public ArrayList<Profissional> filtrarProfissionaisPorEspecialidade(String especialidade) {
+        ArrayList<Profissional> filtrados = new ArrayList<>();
+        for (Profissional profissional : profissionais) {
+            if (profissional.getEspecialidade().equals(especialidade)) {
+                filtrados.add(profissional);
             }
         }
         return filtrados;

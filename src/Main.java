@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -276,26 +277,26 @@ public class Main {
     }
 
     public static void listarProfissionais() {
-        Profissional[] profissionais = servico.listarProfissionais();
-        if (profissionais.length == 0) {
+        ArrayList<Profissional> profissionais = servico.listarProfissionais();
+        if (profissionais.isEmpty()) {
             System.out.println("Nenhum profissional cadastrado.");
             return;
         }
-        for (int i = 0; i < profissionais.length; i++) {
-            System.out.println(profissionais[i].exibirResumo());
+        for (Profissional profissional : profissionais) {
+            System.out.println(profissional.exibirResumo());
         }
     }
 
     public static void filtrarProfissionais() {
         System.out.print("Especialidade: ");
         String esp = sc.nextLine();
-        Profissional[] profissionais = servico.filtrarProfissionaisPorEspecialidade(esp);
+        ArrayList<Profissional> profissionais = servico.filtrarProfissionaisPorEspecialidade(esp);
 
-        for (int i = 0; i < profissionais.length; i++) {
-            System.out.println(profissionais[i].exibirResumo());
+        for (Profissional profissional : profissionais) {
+            System.out.println(profissional.exibirResumo());
         }
 
-        if (profissionais.length == 0) {
+        if (profissionais.isEmpty()) {
             System.out.println("Nenhum profissional com essa especialidade.");
         }
     }
@@ -417,12 +418,12 @@ public class Main {
         String diaSemana = descobrirDiaSemana(data);
 
         Profissional profissionalEncontrado = null;
-        Profissional[] profissionais = servico.filtrarProfissionaisPorEspecialidade(esp);
-        for (int i = 0; i < profissionais.length; i++) {
-            if (profissionais[i].getValorConsulta() > 0
-                    && profissionais[i].atendeNoDia(diaSemana)
-                    && !temConflito(profissionais[i].nome, data, horario)) {
-                profissionalEncontrado = profissionais[i];
+        ArrayList<Profissional> profissionais = servico.filtrarProfissionaisPorEspecialidade(esp);
+        for (Profissional profissional : profissionais) {
+            if (profissional.getValorConsulta() > 0
+                    && profissional.atendeNoDia(diaSemana)
+                    && !temConflito(profissional.nome, data, horario)) {
+                profissionalEncontrado = profissional;
                 break;
             }
         }
