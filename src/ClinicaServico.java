@@ -13,6 +13,20 @@ public class ClinicaServico {
         cpfsCadastrados = new HashSet<String>();
     }
 
+    public void cadastrarPaciente(String nome, String cpf) throws OperacaoInvalidaException {
+        cadastrarPaciente(new Paciente(nome, cpf));
+    }
+
+    public void cadastrarPaciente(String nome, String cpf, int idade, String telefone)
+            throws OperacaoInvalidaException {
+        cadastrarPaciente(new Paciente(nome, cpf, idade, telefone));
+    }
+
+    public void cadastrarPaciente(String nome, String cpf, int idade, String telefone, Convenio convenio)
+            throws OperacaoInvalidaException {
+        cadastrarPaciente(new Paciente(nome, cpf, idade, telefone, convenio));
+    }
+
     public void cadastrarPaciente(Paciente paciente) throws OperacaoInvalidaException {
         validarPacienteParaCadastro(paciente);
         String cpf = normalizarCpf(paciente.getCpf());
@@ -25,6 +39,14 @@ public class ClinicaServico {
         Paciente paciente = pacientesPorCpf.get(normalizarCpf(cpf));
         if (paciente == null) {
             throw new PacienteNaoEncontradoException("Paciente nao encontrado.");
+        }
+        return paciente;
+    }
+
+    public Paciente buscarPacienteAtivo(String cpf) throws PacienteNaoEncontradoException, PacienteInativoException {
+        Paciente paciente = buscarPacientePorCpf(cpf);
+        if (!paciente.isAtivo()) {
+            throw new PacienteInativoException("Paciente inativo. Nao e possivel continuar a operacao.");
         }
         return paciente;
     }
@@ -66,8 +88,8 @@ public class ClinicaServico {
         return pacientesPorCpf.containsKey(normalizarCpf(cpf));
     }
 
-    public int getTotalPacientes() {
-        return pacientes.size();
+    public boolean pacienteTemConvenio(String cpf) throws PacienteNaoEncontradoException {
+        return buscarPacientePorCpf(cpf).temConvenio();
     }
 
     private String normalizarCpf(String cpf) {
@@ -81,9 +103,7 @@ public class ClinicaServico {
         if (paciente == null) {
             throw new OperacaoInvalidaException("Paciente invalido.");
         }
-        if (paciente.getNome().trim().equals("")) {
-            throw new OperacaoInvalidaException("Nome obrigatorio.");
-        }
+        validarTextoObrigatorio(paciente.getNome(), "Nome obrigatorio.");
         String cpf = normalizarCpf(paciente.getCpf());
         if (cpf.equals("")) {
             throw new OperacaoInvalidaException("CPF obrigatorio.");
@@ -97,8 +117,12 @@ public class ClinicaServico {
         if (idade < 0) {
             throw new OperacaoInvalidaException("Idade invalida.");
         }
-        if (telefone == null || telefone.trim().equals("")) {
-            throw new OperacaoInvalidaException("Telefone obrigatorio para complementar cadastro.");
+        validarTextoObrigatorio(telefone, "Telefone obrigatorio para complementar cadastro.");
+    }
+
+    private void validarTextoObrigatorio(String valor, String mensagem) throws OperacaoInvalidaException {
+        if (valor == null || valor.trim().equals("")) {
+            throw new OperacaoInvalidaException(mensagem);
         }
     }
 }
