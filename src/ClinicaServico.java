@@ -1,16 +1,27 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class ClinicaServico {
     private ArrayList<Paciente> pacientes;
+    private HashSet<String> cpfsCadastrados;
 
     public ClinicaServico() {
         pacientes = new ArrayList<Paciente>();
+        cpfsCadastrados = new HashSet<String>();
     }
 
     public void cadastrarPaciente(Paciente paciente) {
-        if (paciente != null) {
-            pacientes.add(paciente);
+        if (paciente == null) {
+            return;
         }
+
+        String cpf = normalizarCpf(paciente.getCpf());
+        if (cpf.equals("") || cpfsCadastrados.contains(cpf)) {
+            return;
+        }
+
+        pacientes.add(paciente);
+        cpfsCadastrados.add(cpf);
     }
 
     public Paciente buscarPacientePorCpf(String cpf) {
@@ -33,7 +44,7 @@ public class ClinicaServico {
     }
 
     public boolean pacienteExiste(String cpf) {
-        return buscarIndicePaciente(cpf) != -1;
+        return cpfsCadastrados.contains(normalizarCpf(cpf));
     }
 
     public int getTotalPacientes() {
@@ -41,11 +52,19 @@ public class ClinicaServico {
     }
 
     private int buscarIndicePaciente(String cpf) {
+        String cpfBusca = normalizarCpf(cpf);
         for (int i = 0; i < pacientes.size(); i++) {
-            if (pacientes.get(i).getCpf().equals(cpf)) {
+            if (pacientes.get(i).getCpf().equals(cpfBusca)) {
                 return i;
             }
         }
         return -1;
+    }
+
+    private String normalizarCpf(String cpf) {
+        if (cpf == null) {
+            return "";
+        }
+        return cpf.trim();
     }
 }
