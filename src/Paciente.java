@@ -57,7 +57,7 @@ public class Paciente extends Pessoa {
     }
 
     public void setIdade(int idade) {
-        if (idade >= 0) {
+        if (idade >= 0 && idade <= 130) {
             this.idade = idade;
         }
     }

@@ -21,8 +21,8 @@ public class Main {
     static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        int opcao = -1;
-        while (opcao != 0) {
+        Integer opcao = -1;
+        while (opcao.intValue() != 0) {
             System.out.println("\n=== CLINICA VIDAPLENA ===");
             System.out.println("1 - Pacientes");
             System.out.println("2 - Profissionais");
@@ -31,10 +31,13 @@ public class Main {
             System.out.println("5 - Pagamentos");
             System.out.println("6 - Relatorios");
             System.out.println("0 - Sair");
-            System.out.print("Escolha: ");
-            opcao = Integer.parseInt(sc.nextLine());
+            opcao = lerInteiro("Escolha: ");
+            if (opcao == null) {
+                opcao = -1;
+                continue;
+            }
 
-            switch (opcao) {
+            switch (opcao.intValue()) {
                 case 1: menuPacientes(); break;
                 case 2: menuProfissionais(); break;
                 case 3: menuConsultas(); break;
@@ -51,8 +54,8 @@ public class Main {
     // ---- PACIENTES ----
 
     public static void menuPacientes() {
-        int op = -1;
-        while (op != 0) {
+        Integer op = -1;
+        while (op.intValue() != 0) {
             System.out.println("\n--- PACIENTES ---");
             System.out.println("1 - Cadastrar");
             System.out.println("2 - Complementar cadastro");
@@ -60,10 +63,13 @@ public class Main {
             System.out.println("4 - Listar todos");
             System.out.println("5 - Desativar");
             System.out.println("0 - Voltar");
-            System.out.print("Opcao: ");
-            op = Integer.parseInt(sc.nextLine());
+            op = lerInteiro("Opcao: ");
+            if (op == null) {
+                op = -1;
+                continue;
+            }
 
-            switch (op) {
+            switch (op.intValue()) {
                 case 1: cadastrarPaciente(); break;
                 case 2: complementarPaciente(); break;
                 case 3: buscarPaciente(); break;
@@ -892,6 +898,10 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
         }
     }
 
+    public static Consulta[] consultasComoArray() {
+        return consultas.toArray(new Consulta[consultas.size()]);
+    }
+
     // ---- RELATORIOS ----
 
     public static void menuRelatorios() {
@@ -908,22 +918,22 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
 
             switch (op) {
                 case 1:
-                    Relatorio.gerarRelatorio(consultas, totalConsultas, atendimentos, totalAtendimentos);
+                    Relatorio.gerarRelatorio(consultasComoArray(), consultas.size(), atendimentos, totalAtendimentos);
                     break;
                 case 2:
                     System.out.print("Nome do profissional: ");
                     String nome = sc.nextLine();
-                    Relatorio.gerarRelatorio(consultas, totalConsultas, atendimentos, totalAtendimentos, nome);
+                    Relatorio.gerarRelatorio(consultasComoArray(), consultas.size(), atendimentos, totalAtendimentos, nome);
                     break;
                 case 3:
                     System.out.print("Data inicio (DD/MM/AAAA): ");
                     String ini = sc.nextLine();
                     System.out.print("Data fim (DD/MM/AAAA): ");
                     String fim = sc.nextLine();
-                    Relatorio.gerarRelatorio(consultas, totalConsultas, atendimentos, totalAtendimentos, ini, fim);
+                    Relatorio.gerarRelatorio(consultasComoArray(), consultas.size(), atendimentos, totalAtendimentos, ini, fim);
                     break;
                 case 4:
-                    Relatorio.gerarResumoFinanceiro(consultas, totalConsultas, pagamentos, totalPagamentos, multas, totalMultas);
+                    Relatorio.gerarResumoFinanceiro(consultasComoArray(), consultas.size(), pagamentos, totalPagamentos, multas, totalMultas);
                     break;
                 case 0: break;
                 default: System.out.println("Opcao invalida!"); break;
