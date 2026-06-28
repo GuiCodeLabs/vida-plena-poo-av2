@@ -267,103 +267,174 @@ public class Main {
     }
 
     public static void cadastrarProfissional() {
+        if (totalProfissionais >= profissionais.length) {
+            System.out.println("Limite de profissionais atingido.");
+            return;
+        }
+
         System.out.print("Nome: ");
         String nome = sc.nextLine();
         System.out.print("Especialidade (clinica geral/fisioterapia/psicologia/nutricao): ");
         String esp = sc.nextLine();
 
-        if (!Profissional.especialidadeValida(esp)) {
+        if (!servico.especialidadeAceita(esp)) {
             System.out.println("Especialidade invalida!");
             return;
         }
 
-        System.out.print("Tipo (1-Minimo / 2-Com registro e valor / 3-Completo): ");
-        int tipo = Integer.parseInt(sc.nextLine());
+        boolean cadastrado;
 
-        if (tipo == 1) {
-            profissionais[totalProfissionais] = new Profissional(nome, esp);
-        } else if (tipo == 2) {
-            System.out.print("Registro: ");
-            String reg = sc.nextLine();
-            System.out.print("Valor consulta: ");
-            double valor = Double.parseDouble(sc.nextLine());
-            profissionais[totalProfissionais] = new Profissional(nome, esp, reg, valor);
-        } else {
-            System.out.print("Registro: ");
-            String reg = sc.nextLine();
-            System.out.print("Valor consulta: ");
-            double valor = Double.parseDouble(sc.nextLine());
-            System.out.print("Quantos dias atende? ");
-            int qtd = Integer.parseInt(sc.nextLine());
-            String[] dias = new String[7];
-            for (int i = 0; i < qtd; i++) {
-                System.out.print("Dia " + (i+1) + ": ");
-                dias[i] = sc.nextLine();
+        try {
+            System.out.print("Tipo (1-Minimo / 2-Com registro e valor / 3-Completo): ");
+            int tipo = Integer.parseInt(sc.nextLine());
+
+            if (tipo == 1) {
+                cadastrado = servico.cadastrarProfissional(nome, esp);
+            } else if (tipo == 2) {
+                System.out.print("Registro: ");
+                String reg = sc.nextLine();
+                System.out.print("Valor consulta: ");
+                double valor = Double.parseDouble(sc.nextLine());
+                String dadoEspecifico = lerDadoEspecificoProfissional(esp);
+                cadastrado = servico.cadastrarProfissional(nome, esp, reg, valor, dadoEspecifico);
+            } else if (tipo == 3) {
+                System.out.print("Registro: ");
+                String reg = sc.nextLine();
+                System.out.print("Valor consulta: ");
+                double valor = Double.parseDouble(sc.nextLine());
+                String dadoEspecifico = lerDadoEspecificoProfissional(esp);
+                ArrayList<HorarioDisponivel> horarios = lerHorariosProfissional();
+                cadastrado = servico.cadastrarProfissional(nome, esp, reg, valor, horarios, dadoEspecifico);
+            } else {
+                System.out.println("Tipo invalido.");
+                return;
             }
-            profissionais[totalProfissionais] = new Profissional(nome, esp, reg, valor, dias, qtd);
+
+            if (cadastrado) {
+                profissionais[totalProfissionais] = servico.buscarProfissionalPorNome(nome);
+                totalProfissionais++;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Informe um numero valido.");
+            return;
+        } catch (OperacaoInvalidaException | ProfissionalNaoEncontradoException | IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
         }
-        totalProfissionais++;
+
+        if (!cadastrado) {
+            System.out.println("Nao foi possivel cadastrar profissional.");
+            return;
+        }
         System.out.println("Profissional cadastrado!");
     }
 
     public static void atualizarProfissional() {
         System.out.print("Nome do profissional: ");
         String nome = sc.nextLine();
-        int idx = buscarIndiceProfissional(nome);
-        if (idx == -1) {
-            System.out.println("Profissional nao encontrado.");
-            return;
-        }
 
         System.out.print("Vai informar dias? (1-Nao / 2-Sim): ");
-        int tipo = Integer.parseInt(sc.nextLine());
+        int tipo;
+        try {
+            tipo = Integer.parseInt(sc.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Informe um numero valido.");
+            return;
+        }
 
         System.out.print("Registro: ");
         String reg = sc.nextLine();
         System.out.print("Valor consulta: ");
-        double valor = Double.parseDouble(sc.nextLine());
+        double valor;
+        boolean atualizado;
 
-        if (tipo == 1) {
-            profissionais[idx].atualizar(reg, valor);
-        } else {
-            System.out.print("Quantos dias? ");
-            int qtd = Integer.parseInt(sc.nextLine());
-            String[] dias = new String[7];
-            for (int i = 0; i < qtd; i++) {
-                System.out.print("Dia " + (i+1) + ": ");
-                dias[i] = sc.nextLine();
+        try {
+            valor = Double.parseDouble(sc.nextLine());
+            if (tipo == 1) {
+                atualizado = servico.atualizarProfissional(nome, reg, valor);
+            } else if (tipo == 2) {
+                ArrayList<HorarioDisponivel> horarios = lerHorariosProfissional();
+                atualizado = servico.atualizarProfissional(nome, reg, valor, horarios);
+            } else {
+                System.out.println("Tipo invalido.");
+                return;
             }
-            profissionais[idx].atualizar(reg, valor, dias, qtd);
+        } catch (NumberFormatException e) {
+            System.out.println("Informe um numero valido.");
+            return;
+        } catch (ProfissionalNaoEncontradoException | OperacaoInvalidaException | IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        if (!atualizado) {
+            System.out.println("Profissional nao encontrado.");
+            return;
         }
         System.out.println("Profissional atualizado!");
     }
 
+    public static String lerDadoEspecificoProfissional(String especialidade) {
+        if (especialidade.equals("fisioterapia")) {
+            System.out.print("Total de sessoes previstas: ");
+            return sc.nextLine();
+        }
+        if (especialidade.equals("psicologia")) {
+            System.out.print("Abordagem terapeutica: ");
+            return sc.nextLine();
+        }
+        if (especialidade.equals("nutricao")) {
+            System.out.print("Plano alimentar: ");
+            return sc.nextLine();
+        }
+
+        System.out.print("Encaminhamento: ");
+        return sc.nextLine();
+    }
+
+    public static ArrayList<HorarioDisponivel> lerHorariosProfissional() {
+        ArrayList<HorarioDisponivel> horarios = new ArrayList<HorarioDisponivel>();
+
+        System.out.print("Quantos horarios atende? ");
+        int quantidade = Integer.parseInt(sc.nextLine());
+
+        for (int i = 0; i < quantidade; i++) {
+            System.out.print("Dia " + (i + 1) + ": ");
+            String dia = sc.nextLine();
+            System.out.print("Turno " + (i + 1) + ": ");
+            String turno = sc.nextLine();
+            horarios.add(new HorarioDisponivel(dia, turno));
+        }
+
+        return horarios;
+    }
+
     public static void listarProfissionais() {
-        if (totalProfissionais == 0) {
+        ArrayList<Profissional> listaProfissionais = servico.listarProfissionais();
+        if (listaProfissionais.isEmpty()) {
             System.out.println("Nenhum profissional cadastrado.");
             return;
         }
-        for (int i = 0; i < totalProfissionais; i++) {
-            System.out.println(profissionais[i].exibirResumo());
+        for (Profissional profissional : listaProfissionais) {
+            System.out.println(profissional.exibirResumo());
         }
     }
 
     public static void filtrarProfissionais() {
         System.out.print("Especialidade: ");
         String esp = sc.nextLine();
-        boolean achou = false;
-        for (int i = 0; i < totalProfissionais; i++) {
-            if (profissionais[i].especialidade.equals(esp)) {
-                System.out.println(profissionais[i].exibirResumo());
-                achou = true;
-            }
+        ArrayList<Profissional> listaProfissionais = servico.filtrarProfissionaisPorEspecialidade(esp);
+
+        for (Profissional profissional : listaProfissionais) {
+            System.out.println(profissional.exibirResumo());
         }
-        if (!achou) System.out.println("Nenhum profissional com essa especialidade.");
+
+        if (listaProfissionais.isEmpty()) System.out.println("Nenhum profissional com essa especialidade.");
     }
 
     public static int buscarIndiceProfissional(String nome) {
         for (int i = 0; i < totalProfissionais; i++) {
-            if (profissionais[i].nome.equals(nome)) return i;
+            if (profissionais[i].getNome().equals(nome)) return i;
         }
         return -1;
     }
@@ -738,7 +809,7 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
 
             String nomeProfConsulta = consultas.get(idxConsulta).nomeProfissional;
             int idxProfConsulta = buscarIndiceProfissional(nomeProfConsulta);
-            String especialidade = profissionais[idxProfConsulta].especialidade;
+            String especialidade = profissionais[idxProfConsulta].getEspecialidade();
 
             try {
                 pagamentos[totalPagamentos] = new PagamentoConvenio(idxConsulta, valor, tipoPag, convenio, especialidade);
@@ -766,7 +837,7 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
         // obtem valor do profissional
         String nomeProf = consultas.get(idxConsulta).nomeProfissional;
         int idxProf = buscarIndiceProfissional(nomeProf);
-        double valorBase = profissionais[idxProf].valorConsulta;
+        double valorBase = profissionais[idxProf].getValorConsulta();
 
         // verifica convenio e tipo
         String cpfPac = consultas.get(idxConsulta).cpfPaciente;
@@ -827,7 +898,7 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
                 System.out.println(e.getMessage());
             return;
         }
-            String especialidade = profissionais[idxProf].especialidade;
+            String especialidade = profissionais[idxProf].getEspecialidade();
 
             try {
                 pagamentos[totalPagamentos] = new PagamentoConvenio(idxConsulta, valorBase, tipoPag, convenio, especialidade);

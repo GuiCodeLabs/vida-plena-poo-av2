@@ -11,11 +11,174 @@ public class ClinicaServico {
     private ArrayList<Paciente> pacientes;
     private HashMap<String, Paciente> pacientesPorCpf;
     private HashSet<String> cpfsCadastrados;
+    private ArrayList<Profissional> profissionais;
+    private HashMap<String, Profissional> profissionaisPorNome;
 
     public ClinicaServico() {
         pacientes = new ArrayList<Paciente>();
         pacientesPorCpf = new HashMap<String, Paciente>();
         cpfsCadastrados = new HashSet<String>();
+        profissionais = new ArrayList<Profissional>();
+        profissionaisPorNome = new HashMap<String, Profissional>();
+    }
+
+    public boolean especialidadeAceita(String especialidade) {
+        return Profissional.especialidadeValida(especialidade);
+    }
+
+    public boolean cadastrarProfissional(String nome, String especialidade)
+            throws OperacaoInvalidaException {
+        return cadastrarProfissional(criarProfissional(nome, especialidade));
+    }
+
+    public boolean cadastrarProfissional(String nome, String especialidade,
+                                         String registroProfissional, double valorConsulta,
+                                         String dadoEspecifico)
+            throws OperacaoInvalidaException {
+        return cadastrarProfissional(
+                criarProfissional(nome, especialidade, registroProfissional,
+                        valorConsulta, new ArrayList<HorarioDisponivel>(), dadoEspecifico)
+        );
+    }
+
+    public boolean cadastrarProfissional(String nome, String especialidade,
+                                         String registroProfissional, double valorConsulta,
+                                         ArrayList<HorarioDisponivel> horarios,
+                                         String dadoEspecifico)
+            throws OperacaoInvalidaException {
+        return cadastrarProfissional(
+                criarProfissional(nome, especialidade, registroProfissional,
+                        valorConsulta, horarios, dadoEspecifico)
+        );
+    }
+
+    private Profissional criarProfissional(String nome, String especialidade)
+            throws OperacaoInvalidaException {
+        validarNomeProfissional(nome);
+        validarEspecialidade(especialidade);
+        if (especialidade.equals("clinica geral")) {
+            return new ClinicoGeral(nome);
+        }
+        if (especialidade.equals("fisioterapia")) {
+            return new Fisioterapeuta(nome);
+        }
+        if (especialidade.equals("psicologia")) {
+            return new Psicologo(nome);
+        }
+        if (especialidade.equals("nutricao")) {
+            return new Nutricionista(nome);
+        }
+        throw new OperacaoInvalidaException("Especialidade invalida.");
+    }
+
+    private Profissional criarProfissional(String nome, String especialidade,
+                                           String registroProfissional, double valorConsulta,
+                                           ArrayList<HorarioDisponivel> horarios,
+                                           String dadoEspecifico)
+            throws OperacaoInvalidaException {
+        validarNomeProfissional(nome);
+        validarEspecialidade(especialidade);
+        validarValorConsulta(valorConsulta);
+        if (dadoEspecifico == null) {
+            dadoEspecifico = "";
+        }
+
+        if (especialidade.equals("clinica geral")) {
+            return new ClinicoGeral(nome, registroProfissional, valorConsulta, horarios, dadoEspecifico);
+        }
+        if (especialidade.equals("fisioterapia")) {
+            int totalSessoes = 0;
+            if (!dadoEspecifico.equals("")) {
+                try {
+                    totalSessoes = Integer.parseInt(dadoEspecifico);
+                } catch (NumberFormatException e) {
+                    throw new OperacaoInvalidaException("Total de sessoes deve ser um numero inteiro.", e);
+                }
+            }
+            return new Fisioterapeuta(nome, registroProfissional, valorConsulta, horarios, totalSessoes);
+        }
+        if (especialidade.equals("psicologia")) {
+            return new Psicologo(nome, registroProfissional, valorConsulta, horarios, dadoEspecifico);
+        }
+        if (especialidade.equals("nutricao")) {
+            return new Nutricionista(nome, registroProfissional, valorConsulta, horarios, dadoEspecifico);
+        }
+        throw new OperacaoInvalidaException("Especialidade invalida.");
+    }
+
+    private boolean cadastrarProfissional(Profissional profissional)
+            throws OperacaoInvalidaException {
+        if (profissional == null) {
+            throw new OperacaoInvalidaException("Profissional invalido.");
+        }
+        if (!especialidadeAceita(profissional.getEspecialidade())) {
+            throw new OperacaoInvalidaException("Especialidade invalida.");
+        }
+        if (profissionaisPorNome.containsKey(profissional.getNome())) {
+            throw new OperacaoInvalidaException("Ja existe profissional com esse nome.");
+        }
+
+        profissionais.add(profissional);
+        profissionaisPorNome.put(profissional.getNome(), profissional);
+        return true;
+    }
+
+    public boolean atualizarProfissional(String nome, String registro, double valor)
+            throws ProfissionalNaoEncontradoException, OperacaoInvalidaException {
+        validarValorConsulta(valor);
+        Profissional profissional = buscarProfissionalPorNome(nome);
+        profissional.atualizar(registro, valor);
+        return true;
+    }
+
+    public boolean atualizarProfissional(String nome, String registro, double valor,
+                                         ArrayList<HorarioDisponivel> horarios)
+            throws ProfissionalNaoEncontradoException, OperacaoInvalidaException {
+        validarValorConsulta(valor);
+        Profissional profissional = buscarProfissionalPorNome(nome);
+        profissional.atualizar(registro, valor, horarios);
+        return true;
+    }
+
+    public Profissional buscarProfissionalPorNome(String nome)
+            throws ProfissionalNaoEncontradoException {
+        Profissional profissional = profissionaisPorNome.get(nome);
+        if (profissional == null) {
+            throw new ProfissionalNaoEncontradoException("Profissional nao encontrado.");
+        }
+        return profissional;
+    }
+
+    public ArrayList<Profissional> listarProfissionais() {
+        return new ArrayList<Profissional>(profissionais);
+    }
+
+    public ArrayList<Profissional> filtrarProfissionaisPorEspecialidade(String especialidade) {
+        ArrayList<Profissional> filtrados = new ArrayList<Profissional>();
+        for (Profissional profissional : profissionais) {
+            if (profissional.getEspecialidade().equals(especialidade)) {
+                filtrados.add(profissional);
+            }
+        }
+        return filtrados;
+    }
+
+    private void validarNomeProfissional(String nome) throws OperacaoInvalidaException {
+        if (nome == null || nome.trim().equals("")) {
+            throw new OperacaoInvalidaException("Nome do profissional nao pode ser vazio.");
+        }
+    }
+
+    private void validarValorConsulta(double valorConsulta) throws OperacaoInvalidaException {
+        if (valorConsulta < 0) {
+            throw new OperacaoInvalidaException("Valor da consulta nao pode ser negativo.");
+        }
+    }
+
+    private void validarEspecialidade(String especialidade) throws OperacaoInvalidaException {
+        if (!especialidadeAceita(especialidade)) {
+            throw new OperacaoInvalidaException("Especialidade invalida.");
+        }
     }
 
     public void cadastrarPaciente(String nome, String cpf) throws OperacaoInvalidaException {
@@ -236,7 +399,7 @@ public class ClinicaServico {
 
     private int buscarIndiceProfissional(Profissional[] profissionais, int totalProfissionais, String nome) {
         for (int i = 0; i < totalProfissionais; i++) {
-            if (profissionais[i].nome.equals(nome)) {
+            if (profissionais[i].getNome().equals(nome)) {
                 return i;
             }
         }
@@ -267,7 +430,7 @@ public class ClinicaServico {
             throw new ProfissionalNaoEncontradoException("Profissional não encontrado.");
         }
 
-        if (profissionais[idxProf].valorConsulta == 0) {
+        if (profissionais[idxProf].getValorConsulta() == 0) {
             throw new OperacaoInvalidaException("Profissional sem valor definido. Não pode agendar.");
         }
 
@@ -305,10 +468,10 @@ public class ClinicaServico {
 
         int idxProf = -1;
         for (int i = 0; i < totalProfissionais; i++) {
-            if (profissionais[i].especialidade.equals(especialidade)
-                    && profissionais[i].valorConsulta > 0
+            if (profissionais[i].getEspecialidade().equals(especialidade)
+                    && profissionais[i].getValorConsulta() > 0
                     && profissionais[i].atendeNoDia(diaSemana)
-                    && !temConflito(consultas, profissionais[i].nome, data, horario)) {
+                    && !temConflito(consultas, profissionais[i].getNome(), data, horario)) {
                 idxProf = i;
                 break;
             }
@@ -318,7 +481,7 @@ public class ClinicaServico {
             throw new HorarioIndisponivelException("Nenhum profissional disponível para essa especialidade.");
         }
 
-        consultas.add(new Consulta(cpf, profissionais[idxProf].nome, data, horario));
+        consultas.add(new Consulta(cpf, profissionais[idxProf].getNome(), data, horario));
     }
 
     public Consulta buscarConsulta(
