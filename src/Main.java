@@ -507,68 +507,74 @@ public class Main {
         System.out.println("Consulta cancelada.");
     }
 
-    public static void remarcarConsulta() {
-        System.out.print("CPF: ");
-        String cpf = sc.nextLine();
-        System.out.print("Data original (DD/MM/AAAA): ");
-        String dataOrig = sc.nextLine();
-        System.out.print("Horario original (HH:MM): ");
-        String horarioOrig = sc.nextLine();
+public static void remarcarConsulta() {
+    System.out.print("CPF: ");
+    String cpf = sc.nextLine();
+    System.out.print("Data original (DD/MM/AAAA): ");
+    String dataOrig = sc.nextLine();
+    System.out.print("Horario original (HH:MM): ");
+    String horarioOrig = sc.nextLine();
 
-        int idx = -1;
-        for (int i = 0; i < totalConsultas; i++) {
-            if (consultas[i].cpfPaciente.equals(cpf) && consultas[i].data.equals(dataOrig)
-                    && consultas[i].horario.equals(horarioOrig)
-                    && consultas[i].status.equals("agendada")) {
-                idx = i;
-                break;
-            }
+    int idx = -1;
+    for (int i = 0; i < totalConsultas; i++) {
+        if (consultas[i].cpfPaciente.equals(cpf) && consultas[i].data.equals(dataOrig)
+                && consultas[i].horario.equals(horarioOrig)
+                && consultas[i].status.equals("agendada")) {
+            idx = i;
+            break;
         }
-
-        if (idx == -1) {
-            System.out.println("Consulta agendada nao encontrada.");
-            return;
-        }
-
-        System.out.print("Apenas trocar horario no mesmo dia? (1-Sim / 2-Nao): ");
-        int tipo = Integer.parseInt(sc.nextLine());
-
-        String novaData;
-        String novoHorario;
-
-        if (tipo == 1) {
-            novaData = dataOrig;
-            System.out.print("Novo horario: ");
-            novoHorario = sc.nextLine();
-        } else {
-            System.out.print("Nova data (DD/MM/AAAA): ");
-            novaData = sc.nextLine();
-            System.out.print("Novo horario (HH:MM): ");
-            novoHorario = sc.nextLine();
-        }
-
-        String nomeProf = consultas[idx].nomeProfissional;
-        int idxProf = buscarIndiceProfissional(nomeProf);
-
-        // se mudou de dia, verifica se prof atende
-        if (tipo == 2) {
-            String dia = descobrirDiaSemana(novaData);
-            if (!profissionais[idxProf].atendeNoDia(dia)) {
-                System.out.println("Profissional nao atende nesse dia.");
-                return;
-            }
-        }
-
-        if (temConflito(nomeProf, novaData, novoHorario)) {
-            System.out.println("Horario ocupado. Nao foi possivel remarcar.");
-            return;
-        }
-
-        consultas[idx].remarcar();
-        consultas[totalConsultas] = new Consulta(cpf, nomeProf, novaData, novoHorario, consultas[idx].tipo);
-        totalConsultas++;
-        System.out.println("Consulta remarcada com sucesso!");
     }
+
+    if (idx == -1) {
+        System.out.println("Consulta agendada nao encontrada.");
+        return;
+    }
+
+    System.out.print("Apenas trocar horario no mesmo dia? (1-Sim / 2-Nao): ");
+    int tipo = Integer.parseInt(sc.nextLine());
+
+    String novaData;
+    String novoHorario;
+
+    if (tipo == 1) {
+        novaData = dataOrig;
+        System.out.print("Novo horario: ");
+        novoHorario = sc.nextLine();
+    } else {
+        System.out.print("Nova data (DD/MM/AAAA): ");
+        novaData = sc.nextLine();
+        System.out.print("Novo horario (HH:MM): ");
+        novoHorario = sc.nextLine();
+    }
+
+    String nomeProf = consultas[idx].nomeProfissional;
+    int idxProf = buscarIndiceProfissional(nomeProf);
+
+    if (tipo == 2) {
+        String dia = descobrirDiaSemana(novaData);
+        if (!profissionais[idxProf].atendeNoDia(dia)) {
+            System.out.println("Profissional nao atende nesse dia.");
+            return;
+        }
+    }
+
+    if (temConflito(nomeProf, novaData, novoHorario)) {
+        System.out.println("Horario ocupado. Nao foi possivel remarcar.");
+        return;
+    }
+
+    String tipoConsulta = consultas[idx].tipo;
+
+    consultas[idx].remarcar();
+
+    Consulta novaConsulta = new Consulta(cpf, nomeProf, novaData, novoHorario, tipoConsulta);
+    novaConsulta.agendar(novaData, novoHorario);
+
+    consultas[totalConsultas] = novaConsulta;
+    totalConsultas++;
+
+    System.out.println("Consulta remarcada com sucesso!");
+}
 
     public static void listarConsultas() {
         if (totalConsultas == 0) {
