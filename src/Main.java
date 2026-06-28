@@ -155,23 +155,25 @@ public class Main {
     }
 
     public static void listarPacientes() {
-        if (totalPacientes == 0) {
+        Paciente[] pacientesCadastrados = servico.listarPacientes();
+        if (pacientesCadastrados.length == 0) {
             System.out.println("Nenhum paciente cadastrado.");
             return;
         }
-        for (int i = 0; i < totalPacientes; i++) {
-            System.out.println(pacientes[i].exibirResumo());
+        for (int i = 0; i < pacientesCadastrados.length; i++) {
+            System.out.println(pacientesCadastrados[i].exibirResumo());
         }
     }
 
     public static void desativarPaciente() {
         System.out.print("CPF: ");
         String cpf = sc.nextLine();
-        int idx = buscarIndicePaciente(cpf);
-        if (idx == -1) {
+        Paciente paciente = servico.buscarPacientePorCpf(cpf);
+        if (paciente == null) {
             System.out.println("Paciente nao encontrado.");
         } else {
-            pacientes[idx].desativar();
+            servico.desativarPaciente(cpf);
+            sincronizarPacientes();
             System.out.println("Paciente desativado.");
         }
     }
