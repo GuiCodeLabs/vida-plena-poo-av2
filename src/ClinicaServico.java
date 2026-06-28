@@ -15,22 +15,69 @@ public class ClinicaServico {
     }
 
     public boolean cadastrarProfissional(String nome, String especialidade) {
-        return cadastrarProfissional(new Profissional(nome, especialidade));
+        return cadastrarProfissional(criarProfissional(nome, especialidade));
     }
 
     public boolean cadastrarProfissional(String nome, String especialidade,
-                                         String registroProfissional, double valorConsulta) {
+                                         String registroProfissional, double valorConsulta,
+                                         String dadoEspecifico) {
         return cadastrarProfissional(
-                new Profissional(nome, especialidade, registroProfissional, valorConsulta)
+                criarProfissional(
+                        nome,
+                        especialidade,
+                        registroProfissional,
+                        valorConsulta,
+                        new ArrayList<>(),
+                        dadoEspecifico
+                )
         );
     }
 
     public boolean cadastrarProfissional(String nome, String especialidade,
                                          String registroProfissional, double valorConsulta,
-                                         String[] dias, int totalDias) {
+                                         ArrayList<HorarioDisponivel> horarios,
+                                         String dadoEspecifico) {
         return cadastrarProfissional(
-                new Profissional(nome, especialidade, registroProfissional, valorConsulta, dias, totalDias)
+                criarProfissional(
+                        nome,
+                        especialidade,
+                        registroProfissional,
+                        valorConsulta,
+                        horarios,
+                        dadoEspecifico
+                )
         );
+    }
+
+    private Profissional criarProfissional(String nome, String especialidade) {
+        if (especialidade.equals("clinica geral")) return new ClinicoGeral(nome);
+        if (especialidade.equals("fisioterapia")) return new Fisioterapeuta(nome);
+        if (especialidade.equals("psicologia")) return new Psicologo(nome);
+        if (especialidade.equals("nutricao")) return new Nutricionista(nome);
+        return null;
+    }
+
+    private Profissional criarProfissional(String nome, String especialidade,
+                                           String registroProfissional, double valorConsulta,
+                                           ArrayList<HorarioDisponivel> horarios,
+                                           String dadoEspecifico) {
+        if (especialidade.equals("clinica geral")) {
+            return new ClinicoGeral(nome, registroProfissional, valorConsulta, horarios, dadoEspecifico);
+        }
+        if (especialidade.equals("fisioterapia")) {
+            int totalSessoes = 0;
+            if (!dadoEspecifico.equals("")) {
+                totalSessoes = Integer.parseInt(dadoEspecifico);
+            }
+            return new Fisioterapeuta(nome, registroProfissional, valorConsulta, horarios, totalSessoes);
+        }
+        if (especialidade.equals("psicologia")) {
+            return new Psicologo(nome, registroProfissional, valorConsulta, horarios, dadoEspecifico);
+        }
+        if (especialidade.equals("nutricao")) {
+            return new Nutricionista(nome, registroProfissional, valorConsulta, horarios, dadoEspecifico);
+        }
+        return null;
     }
 
     private boolean cadastrarProfissional(Profissional profissional) {
@@ -60,13 +107,13 @@ public class ClinicaServico {
     }
 
     public boolean atualizarProfissional(String nome, String registro, double valor,
-                                         String[] dias, int totalDias) {
+                                         ArrayList<HorarioDisponivel> horarios) {
         Profissional profissional = buscarProfissionalPorNome(nome);
         if (profissional == null) {
             return false;
         }
 
-        profissional.atualizar(registro, valor, dias, totalDias);
+        profissional.atualizar(registro, valor, horarios);
         return true;
     }
 

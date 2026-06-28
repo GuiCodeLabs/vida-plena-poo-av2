@@ -1,18 +1,17 @@
-public class Profissional extends Pessoa {
+import java.util.ArrayList;
 
+public abstract class Profissional extends Pessoa {
     private String especialidade;
     private String registroProfissional;
     private double valorConsulta;
-    private String[] diasDisponiveis;
-    private int totalDias;
+    private ArrayList<HorarioDisponivel> horariosDisponiveis;
 
     public Profissional(String nome, String especialidade) {
         super(nome);
         setEspecialidade(especialidade);
         setRegistroProfissional("");
         setValorConsulta(0);
-        this.diasDisponiveis = new String[7];
-        this.totalDias = 0;
+        horariosDisponiveis = new ArrayList<>();
     }
 
     public Profissional(String nome, String especialidade, String registroProfissional, double valorConsulta) {
@@ -20,21 +19,16 @@ public class Profissional extends Pessoa {
         setEspecialidade(especialidade);
         setRegistroProfissional(registroProfissional);
         setValorConsulta(valorConsulta);
-        this.diasDisponiveis = new String[7];
-        this.totalDias = 0;
+        horariosDisponiveis = new ArrayList<>();
     }
 
     public Profissional(String nome, String especialidade, String registroProfissional,
-                        double valorConsulta, String[] dias, int totalDias) {
+                        double valorConsulta, ArrayList<HorarioDisponivel> horarios) {
         super(nome);
         setEspecialidade(especialidade);
         setRegistroProfissional(registroProfissional);
         setValorConsulta(valorConsulta);
-        this.diasDisponiveis = new String[7];
-        this.totalDias = totalDias;
-        for (int i = 0; i < totalDias; i++) {
-            this.diasDisponiveis[i] = dias[i];
-        }
+        setHorariosDisponiveis(horarios);
     }
 
     public String getEspecialidade() {
@@ -61,16 +55,21 @@ public class Profissional extends Pessoa {
         this.valorConsulta = valorConsulta;
     }
 
-    public String[] getDiasDisponiveis() {
-        String[] dias = new String[totalDias];
-        for (int i = 0; i < totalDias; i++) {
-            dias[i] = diasDisponiveis[i];
-        }
-        return dias;
+    public ArrayList<HorarioDisponivel> getHorariosDisponiveis() {
+        return new ArrayList<>(horariosDisponiveis);
     }
 
-    public int getTotalDias() {
-        return totalDias;
+    public void setHorariosDisponiveis(ArrayList<HorarioDisponivel> horarios) {
+        horariosDisponiveis = new ArrayList<>();
+        if (horarios == null) {
+            return;
+        }
+
+        for (HorarioDisponivel horario : horarios) {
+            if (horario != null) {
+                horariosDisponiveis.add(horario);
+            }
+        }
     }
 
     public void atualizar(String registro, double valor) {
@@ -78,18 +77,15 @@ public class Profissional extends Pessoa {
         setValorConsulta(valor);
     }
 
-    public void atualizar(String registro, double valor, String[] dias, int totalDias) {
+    public void atualizar(String registro, double valor, ArrayList<HorarioDisponivel> horarios) {
         setRegistroProfissional(registro);
         setValorConsulta(valor);
-        this.totalDias = totalDias;
-        for (int i = 0; i < totalDias; i++) {
-            this.diasDisponiveis[i] = dias[i];
-        }
+        setHorariosDisponiveis(horarios);
     }
 
     public boolean atendeNoDia(String dia) {
-        for (int i = 0; i < totalDias; i++) {
-            if (diasDisponiveis[i].equals(dia)) {
+        for (HorarioDisponivel horario : horariosDisponiveis) {
+            if (horario.atendeNoDia(dia)) {
                 return true;
             }
         }
@@ -105,12 +101,13 @@ public class Profissional extends Pessoa {
     }
 
     public String exibirResumo() {
-        String dias = "";
-        for (int i = 0; i < totalDias; i++) {
-            if (i > 0) dias = dias + ", ";
-            dias = dias + diasDisponiveis[i];
+        String horarios = "";
+        for (int i = 0; i < horariosDisponiveis.size(); i++) {
+            if (i > 0) horarios = horarios + ", ";
+            horarios = horarios + horariosDisponiveis.get(i).exibirResumo();
         }
+
         return "Nome: " + nome + " | Espec: " + especialidade + " | Reg: " + registroProfissional
-                + " | Valor: R$" + valorConsulta + " | Dias: " + dias;
+                + " | Valor: R$" + valorConsulta + " | Horarios: " + horarios;
     }
 }

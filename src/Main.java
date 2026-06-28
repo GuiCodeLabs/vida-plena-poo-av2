@@ -220,20 +220,16 @@ public class Main {
             String reg = sc.nextLine();
             System.out.print("Valor consulta: ");
             double valor = Double.parseDouble(sc.nextLine());
-            cadastrado = servico.cadastrarProfissional(nome, esp, reg, valor);
+            String dadoEspecifico = lerDadoEspecificoProfissional(esp);
+            cadastrado = servico.cadastrarProfissional(nome, esp, reg, valor, dadoEspecifico);
         } else {
             System.out.print("Registro: ");
             String reg = sc.nextLine();
             System.out.print("Valor consulta: ");
             double valor = Double.parseDouble(sc.nextLine());
-            System.out.print("Quantos dias atende? ");
-            int qtd = Integer.parseInt(sc.nextLine());
-            String[] dias = new String[7];
-            for (int i = 0; i < qtd; i++) {
-                System.out.print("Dia " + (i+1) + ": ");
-                dias[i] = sc.nextLine();
-            }
-            cadastrado = servico.cadastrarProfissional(nome, esp, reg, valor, dias, qtd);
+            String dadoEspecifico = lerDadoEspecificoProfissional(esp);
+            ArrayList<HorarioDisponivel> horarios = lerHorariosProfissional();
+            cadastrado = servico.cadastrarProfissional(nome, esp, reg, valor, horarios, dadoEspecifico);
         }
 
         if (!cadastrado) {
@@ -259,14 +255,8 @@ public class Main {
         if (tipo == 1) {
             atualizado = servico.atualizarProfissional(nome, reg, valor);
         } else {
-            System.out.print("Quantos dias? ");
-            int qtd = Integer.parseInt(sc.nextLine());
-            String[] dias = new String[7];
-            for (int i = 0; i < qtd; i++) {
-                System.out.print("Dia " + (i+1) + ": ");
-                dias[i] = sc.nextLine();
-            }
-            atualizado = servico.atualizarProfissional(nome, reg, valor, dias, qtd);
+            ArrayList<HorarioDisponivel> horarios = lerHorariosProfissional();
+            atualizado = servico.atualizarProfissional(nome, reg, valor, horarios);
         }
 
         if (!atualizado) {
@@ -274,6 +264,41 @@ public class Main {
             return;
         }
         System.out.println("Profissional atualizado!");
+    }
+
+    public static String lerDadoEspecificoProfissional(String especialidade) {
+        if (especialidade.equals("fisioterapia")) {
+            System.out.print("Total de sessoes previstas: ");
+            return sc.nextLine();
+        }
+        if (especialidade.equals("psicologia")) {
+            System.out.print("Abordagem terapeutica: ");
+            return sc.nextLine();
+        }
+        if (especialidade.equals("nutricao")) {
+            System.out.print("Plano alimentar: ");
+            return sc.nextLine();
+        }
+
+        System.out.print("Encaminhamento: ");
+        return sc.nextLine();
+    }
+
+    public static ArrayList<HorarioDisponivel> lerHorariosProfissional() {
+        ArrayList<HorarioDisponivel> horarios = new ArrayList<>();
+
+        System.out.print("Quantos horarios atende? ");
+        int quantidade = Integer.parseInt(sc.nextLine());
+
+        for (int i = 0; i < quantidade; i++) {
+            System.out.print("Dia " + (i + 1) + ": ");
+            String dia = sc.nextLine();
+            System.out.print("Turno " + (i + 1) + ": ");
+            String turno = sc.nextLine();
+            horarios.add(new HorarioDisponivel(dia, turno));
+        }
+
+        return horarios;
     }
 
     public static void listarProfissionais() {
