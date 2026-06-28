@@ -11,11 +11,13 @@ public class Consulta implements Agendavel {
     public String status;
 
     // SOBRECARGA: mesmo nome (Consulta), parâmetros diferentes.
+    // Resolvido em tempo de compilação.
     public Consulta(String cpfPaciente, String nomeProfissional, String data, String horario) {
         this(cpfPaciente, nomeProfissional, data, horario, "inicial");
     }
 
     // SOBRECARGA: construtor com parâmetro extra para informar o tipo da consulta.
+    // Resolvido em tempo de compilação.
     public Consulta(String cpfPaciente, String nomeProfissional, String data, String horario, String tipo) {
         this.cpfPaciente = cpfPaciente;
         this.nomeProfissional = nomeProfissional;
@@ -26,6 +28,7 @@ public class Consulta implements Agendavel {
     }
 
     // SOBRECARGA: construtor com parâmetro extra para informar também o status.
+    // Resolvido em tempo de compilação.
     public Consulta(String cpfPaciente, String nomeProfissional, String data, String horario, String tipo, String status) {
         this.cpfPaciente = cpfPaciente;
         this.nomeProfissional = nomeProfissional;
@@ -42,7 +45,8 @@ public class Consulta implements Agendavel {
         this.status = "agendada";
     }
 
-     // SOBRECARGA: mesmo nome do método agendar, mas com parâmetros diferentes.
+    // SOBRECARGA: mesmo nome do método agendar, mas com parâmetros diferentes.
+    // Resolvido em tempo de compilação.
     public void agendar(String data, String horario) {
         this.data = data;
         this.horario = horario;
@@ -66,6 +70,7 @@ public class Consulta implements Agendavel {
     }
 
     // SOBRECARGA: mesmo nome do método cancelar, mas recebe o motivo.
+    // Resolvido em tempo de compilação.
     public String cancelar(String motivo) {
         cancelar();
         return "Consulta cancelada. Motivo: " + motivo;
@@ -83,6 +88,7 @@ public class Consulta implements Agendavel {
     }
 
     // SOBRECARGA: mesmo nome do método remarcar, mas recebe nova data e novo horário.
+    // Resolvido em tempo de compilação.
     public void remarcar(String novaData, String novoHorario) {
 
         if (!status.equals("agendada")) {
