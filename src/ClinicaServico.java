@@ -201,6 +201,22 @@ public class ClinicaServico {
         return atendimento;
     }
 
+    public static Atendimento registrarAtendimento(
+            Consulta consulta,
+            String observacoes,
+            String diagnostico,
+            String procedimentoInicial,
+            String registroEspecifico
+    ) {
+        Atendimento atendimento = registrarAtendimento(consulta, observacoes, diagnostico, procedimentoInicial);
+
+        if (atendimento != null) {
+            atendimento.setRegistroEspecifico(registroEspecifico);
+        }
+
+        return atendimento;
+    }
+
     // Executa as validações antes de cancelar uma consulta.
     public static void cancelarConsulta(
             ArrayList<Consulta> consultas,
