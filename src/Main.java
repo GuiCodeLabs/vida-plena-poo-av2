@@ -97,19 +97,23 @@ public class Main {
         if (tipo == 1) {
             paciente = new Paciente(nome, cpf);
         } else if (tipo == 2) {
-            System.out.print("Idade: ");
-            int idade = Integer.parseInt(sc.nextLine());
+            Integer idade = lerInteiro("Idade: ");
+            if (idade == null) {
+                return;
+            }
             System.out.print("Telefone: ");
             String tel = sc.nextLine();
-            paciente = new Paciente(nome, cpf, idade, tel);
+            paciente = new Paciente(nome, cpf, idade.intValue(), tel);
         } else if (tipo == 3) {
-            System.out.print("Idade: ");
-            int idade = Integer.parseInt(sc.nextLine());
+            Integer idade = lerInteiro("Idade: ");
+            if (idade == null) {
+                return;
+            }
             System.out.print("Telefone: ");
             String tel = sc.nextLine();
             System.out.print("Convenio: ");
             String conv = sc.nextLine();
-            paciente = new Paciente(nome, cpf, idade, tel, conv);
+            paciente = new Paciente(nome, cpf, idade.intValue(), tel, conv);
         } else {
             System.out.println("Tipo de cadastro invalido.");
             return;
@@ -194,6 +198,16 @@ public class Main {
     public static void sincronizarPacientes() {
         pacientes = servico.listarPacientes();
         totalPacientes = servico.getTotalPacientes();
+    }
+
+    public static Integer lerInteiro(String mensagem) {
+        System.out.print(mensagem);
+        try {
+            return Integer.parseInt(sc.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor numerico invalido.");
+            return null;
+        }
     }
 
     // ---- PROFISSIONAIS ----
