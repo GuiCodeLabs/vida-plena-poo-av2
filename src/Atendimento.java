@@ -78,6 +78,57 @@ public class Atendimento {
         return consulta;
     }
 
+    public String gerarResumoClinico() {
+        String resumo = "Resumo clinico do atendimento";
+
+        if (consulta != null) {
+            resumo = resumo + "\nConsulta: " + consulta.exibirResumo();
+        } else {
+            resumo = resumo + "\nConsulta: " + indiceConsulta;
+        }
+
+        if (observacoes != null && !observacoes.trim().equals("")) {
+            resumo = resumo + "\nObservacoes: " + observacoes.trim();
+        } else if (prontuario != null && prontuario.getObservacoes() != null
+                && !prontuario.getObservacoes().equals("")) {
+            resumo = resumo + "\nObservacoes: " + prontuario.getObservacoes();
+        }
+
+        if (diagnostico != null && !diagnostico.trim().equals("")) {
+            resumo = resumo + "\nDiagnostico: " + diagnostico.trim();
+        } else if (prontuario != null && prontuario.getDiagnostico() != null
+                && !prontuario.getDiagnostico().equals("")) {
+            resumo = resumo + "\nDiagnostico: " + prontuario.getDiagnostico();
+        }
+
+        if (prontuario != null && prontuario.getDataRegistro() != null
+                && !prontuario.getDataRegistro().equals("")) {
+            resumo = resumo + "\nData do registro: " + prontuario.getDataRegistro();
+        }
+
+        if (prontuario != null && !prontuario.getProcedimentosRealizados().isEmpty()) {
+            resumo = resumo + "\nProcedimentos: ";
+            for (int i = 0; i < prontuario.getProcedimentosRealizados().size(); i++) {
+                resumo = resumo + prontuario.getProcedimentosRealizados().get(i);
+                if (i < prontuario.getProcedimentosRealizados().size() - 1) {
+                    resumo = resumo + ", ";
+                }
+            }
+        } else if (totalProcedimentos > 0) {
+            resumo = resumo + "\nProcedimentos: ";
+            for (int i = 0; i < totalProcedimentos; i++) {
+                if (procedimentos[i] != null) {
+                    resumo = resumo + procedimentos[i];
+                    if (i < totalProcedimentos - 1) {
+                        resumo = resumo + ", ";
+                    }
+                }
+            }
+        }
+
+        return resumo;
+    }
+
     public String exibirResumo() {
         String resumo = "Observacoes: " + observacoes;
 
