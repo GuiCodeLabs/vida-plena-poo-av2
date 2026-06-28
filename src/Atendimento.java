@@ -55,6 +55,8 @@ public class Atendimento {
     }
 
     public void adicionarProcedimento(String procedimento) {
+        prontuario.adicionarProcedimento(procedimento);
+
         if (totalProcedimentos < 10) {
             procedimentos[totalProcedimentos] = procedimento;
             totalProcedimentos++;
