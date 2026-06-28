@@ -767,20 +767,25 @@ public class Main {
         String tipoPag = sc.nextLine();
 
         if (tipoPag.equals("cartao")) {
-            System.out.print("Parcelas (1 a 3): ");
+            System.out.print("Parcelas (1 a 6): ");
             int parc = Integer.parseInt(sc.nextLine());
-            if (parc < 1) parc = 1;
-            if (parc > 3) parc = 3;
-            pagamentos[totalPagamentos] = new Pagamento(idxConsulta, valor, tipoPag, parc);
-            if (parc > 1) {
-                double vlrParc = Math.round((valor / parc) * 100.0) / 100.0;
-                System.out.println("Pagamento em " + parc + "x de R$" + vlrParc);
+            try {
+                pagamentos[totalPagamentos] = new PagamentoCartao(idxConsulta, valor, tipoPag, parc);
+                if (parc > 1) {
+                    double vlrFinalCartao = pagamentos[totalPagamentos].getValorFinal();
+                    double vlrParc = Math.round((vlrFinalCartao / parc) * 100.0) / 100.0;
+                    System.out.println("Pagamento em " + parc + "x de R$" + vlrParc);
+                }
+                totalPagamentos++;
+                System.out.println("Pagamento registrado!");
+            } catch (PagamentoInvalidoException e) {
+                System.out.println("Erro no pagamento: " + e.getMessage());
             }
         } else {
-            pagamentos[totalPagamentos] = new Pagamento(idxConsulta, valor, tipoPag);
+            pagamentos[totalPagamentos] = new PagamentoDinheiro(idxConsulta, valor, tipoPag);
+            totalPagamentos++;
+            System.out.println("Pagamento registrado!");
         }
-        totalPagamentos++;
-        System.out.println("Pagamento registrado!");
     }
 
     public static void pagamentoAutomatico() {
@@ -792,12 +797,10 @@ public class Main {
             return;
         }
 
-        // obtem valor do profissional
         String nomeProf = consultas[idxConsulta].nomeProfissional;
         int idxProf = buscarIndiceProfissional(nomeProf);
         double valorBase = profissionais[idxProf].valorConsulta;
 
-        // verifica convenio e tipo
         String cpfPac = consultas[idxConsulta].cpfPaciente;
         int idxPac = buscarIndicePaciente(cpfPac);
 
@@ -813,17 +816,16 @@ public class Main {
         double valorMulta = 0;
 
         double valorFinal;
-        if (temMulta == 1 && desconto == 0) {
-            valorFinal = Pagamento.calcularValor(valorBase);
-        } else if (temMulta == 1) {
-            valorFinal = Pagamento.calcularValor(valorBase, desconto);
+        double valorDescontado = valorBase - (valorBase * desconto / 100);
+        if (temMulta == 1) {
+            valorFinal = valorDescontado;
         } else {
             System.out.print("Valor da multa: ");
             valorMulta = Double.parseDouble(sc.nextLine());
-            valorFinal = Pagamento.calcularValor(valorBase, desconto, valorMulta);
+            valorFinal = valorDescontado + valorMulta;
         }
+        if (valorFinal < 0) valorFinal = 0;
 
-        // mostra detalhes
         System.out.println("Valor base: R$" + valorBase);
         System.out.println("Desconto: " + desconto + "%");
         if (valorMulta > 0) System.out.println("Multa: R$" + valorMulta);
@@ -834,18 +836,22 @@ public class Main {
         String tipoPag = sc.nextLine();
 
         if (tipoPag.equals("cartao")) {
-            System.out.print("Parcelas (1 a 3): ");
+            System.out.print("Parcelas (1 a 6): ");
             int parc = Integer.parseInt(sc.nextLine());
-            if (parc < 1) parc = 1;
-            if (parc > 3) parc = 3;
-            pagamentos[totalPagamentos] = new Pagamento(idxConsulta, valorFinal, tipoPag, parc);
-            double vlrParc = Math.round((valorFinal / parc) * 100.0) / 100.0;
-            System.out.println("Pagamento em " + parc + "x de R$" + vlrParc);
+            try {
+                pagamentos[totalPagamentos] = new PagamentoCartao(idxConsulta, valorFinal, tipoPag, parc, true);
+                double vlrParc = Math.round((valorFinal / parc) * 100.0) / 100.0;
+                System.out.println("Pagamento em " + parc + "x de R$" + vlrParc);
+                totalPagamentos++;
+                System.out.println("Pagamento registrado!");
+            } catch (PagamentoInvalidoException e) {
+                System.out.println("Erro no pagamento: " + e.getMessage());
+            }
         } else {
-            pagamentos[totalPagamentos] = new Pagamento(idxConsulta, valorFinal, tipoPag);
+            pagamentos[totalPagamentos] = new PagamentoDinheiro(idxConsulta, valorFinal, tipoPag, true);
+            totalPagamentos++;
+            System.out.println("Pagamento registrado!");
         }
-        totalPagamentos++;
-        System.out.println("Pagamento registrado!");
     }
 
     public static void listarPagamentos() {
