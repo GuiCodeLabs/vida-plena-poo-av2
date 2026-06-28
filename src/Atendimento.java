@@ -9,6 +9,7 @@ public class Atendimento implements Exportavel {
     private Consulta consulta;
     private Prontuario prontuario;
     private boolean finalizado;
+    private String registroEspecifico;
 
     public Atendimento(int indiceConsulta, String observacoes) {
         this.indiceConsulta = indiceConsulta;
@@ -18,6 +19,7 @@ public class Atendimento implements Exportavel {
         this.totalProcedimentos = 0;
         this.prontuario = new Prontuario();
         this.finalizado = false;
+        setRegistroEspecifico("");
         registrarDadosClinicos(observacoes, "");
     }
 
@@ -29,6 +31,7 @@ public class Atendimento implements Exportavel {
         this.totalProcedimentos = 0;
         this.prontuario = new Prontuario();
         this.finalizado = false;
+        setRegistroEspecifico("");
         registrarDadosClinicos(observacoes, diagnostico);
     }
 
@@ -41,6 +44,7 @@ public class Atendimento implements Exportavel {
         this.totalProcedimentos = 0;
         this.prontuario = new Prontuario();
         this.finalizado = false;
+        setRegistroEspecifico("");
         registrarDadosClinicos(observacoes, diagnostico);
 
         if (procedimentos != null) {
@@ -140,6 +144,18 @@ public class Atendimento implements Exportavel {
 
     public boolean isFinalizado() {
         return finalizado;
+    }
+
+    public String getRegistroEspecifico() {
+        return registroEspecifico;
+    }
+
+    public void setRegistroEspecifico(String registroEspecifico) {
+        if (registroEspecifico == null) {
+            this.registroEspecifico = "";
+        } else {
+            this.registroEspecifico = registroEspecifico.trim();
+        }
     }
 
     @Override
