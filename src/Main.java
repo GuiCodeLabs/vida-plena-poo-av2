@@ -466,38 +466,44 @@ public static void agendarPorEspecialidade() {
     }
 }
 
-    public static void cancelarConsulta() {
+public static void cancelarConsulta() {
+    try {
         System.out.print("CPF: ");
         String cpf = sc.nextLine();
+
         System.out.print("Data (DD/MM/AAAA): ");
         String data = sc.nextLine();
+
         System.out.print("Horario (HH:MM): ");
         String horario = sc.nextLine();
 
-        // localiza a consulta
         int idx = -1;
+
         for (int i = 0; i < consultas.size(); i++) {
-            if (consultas.get(i).cpfPaciente.equals(cpf) && consultas.get(i).data.equals(data)
-                    && consultas.get(i).horario.equals(horario)) {
+            Consulta consulta = consultas.get(i);
+
+            if (consulta.cpfPaciente.equals(cpf)
+                    && consulta.data.equals(data)
+                    && consulta.horario.equals(horario)) {
                 idx = i;
                 break;
             }
         }
 
         if (idx == -1) {
-            System.out.println("Consulta nao encontrada.");
-            return;
-        }
-        if (consultas.get(idx).status.equals("realizada")) {
-            System.out.println("Consulta ja realizada. Nao pode cancelar.");
-            return;
-        }
-        if (consultas.get(idx).status.equals("cancelada")) {
-            System.out.println("Consulta ja cancelada.");
-            return;
+            throw new ConsultaNaoEncontradaException("Consulta não encontrada.");
         }
 
-        // calculo da multa
+        Consulta consulta = consultas.get(idx);
+
+        if (consulta.status.equals("realizada")) {
+            throw new OperacaoInvalidaException("Consulta já realizada. Não pode cancelar.");
+        }
+
+        if (consulta.status.equals("cancelada")) {
+            throw new OperacaoInvalidaException("Consulta já está cancelada.");
+        }
+
         System.out.print("Horario atual (HH:MM): ");
         String horaAtual = sc.nextLine();
 
@@ -515,15 +521,23 @@ public static void agendarPorEspecialidade() {
         int temMotivo = Integer.parseInt(sc.nextLine());
 
         if (temMotivo == 1) {
-            consultas.get(idx).cancelar();
+            consulta.cancelar();
         } else {
             System.out.print("Motivo: ");
             String motivo = sc.nextLine();
-            String msg = consultas.get(idx).cancelar(motivo);
-            System.out.println(msg);
+            System.out.println(consulta.cancelar(motivo));
         }
+
         System.out.println("Consulta cancelada.");
+
+    } catch (ConsultaNaoEncontradaException | OperacaoInvalidaException e) {
+        System.out.println(e.getMessage());
+    } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+        System.out.println("Horário inválido. Use o formato HH:MM.");
+    } finally {
+        System.out.println("Operação de cancelamento finalizada.");
     }
+}
 
 public static void remarcarConsulta() {
     System.out.print("CPF: ");
