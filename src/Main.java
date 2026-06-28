@@ -20,6 +20,26 @@ public class Main {
 
     static Scanner sc = new Scanner(System.in);
 
+    static ArrayList<Convenio> conveniosCadastrados = criarConveniosTeste();
+
+    static ArrayList<Convenio> criarConveniosTeste() {
+        ArrayList<Convenio> lista = new ArrayList<Convenio>();
+        lista.add(new Convenio("UnimedTeste", 60,
+            new String[]{"clinica geral", "psicologia"}));
+        lista.add(new Convenio("BradescoSaudeTeste", 40,
+            new String[]{"fisioterapia", "nutricao"}));
+        return lista;
+    }
+
+    static Convenio buscarConvenioPorNome(String nomeConvenio) {
+        for (int i = 0; i < conveniosCadastrados.size(); i++) {
+            if (conveniosCadastrados.get(i).getNome().equalsIgnoreCase(nomeConvenio)) {
+                return conveniosCadastrados.get(i);
+            }
+        }
+        return null;
+    }
+
     public static void main(String[] args) {
         Integer opcao = -1;
         while (opcao.intValue() != 0) {
@@ -748,7 +768,7 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
         }
     }
 
-    public static void pagamentoDireto() {
+   public static void pagamentoDireto() {
         System.out.print("Indice da consulta: ");
         int idxConsulta = Integer.parseInt(sc.nextLine());
 
@@ -763,20 +783,41 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
         String tipoPag = sc.nextLine();
 
         if (tipoPag.equals("cartao")) {
-            System.out.print("Parcelas (1 a 3): ");
+            System.out.print("Parcelas (1 a 6): ");
             int parc = Integer.parseInt(sc.nextLine());
-            if (parc < 1) parc = 1;
-            if (parc > 3) parc = 3;
-            pagamentos[totalPagamentos] = new Pagamento(idxConsulta, valor, tipoPag, parc);
-            if (parc > 1) {
-                double vlrParc = Math.round((valor / parc) * 100.0) / 100.0;
-                System.out.println("Pagamento em " + parc + "x de R$" + vlrParc);
+            try {
+                pagamentos[totalPagamentos] = new PagamentoCartao(idxConsulta, valor, tipoPag, parc);
+                if (parc > 1) {
+                    double vlrFinalCartao = pagamentos[totalPagamentos].getValorFinal();
+                    double vlrParc = Math.round((vlrFinalCartao / parc) * 100.0) / 100.0;
+                    System.out.println("Pagamento em " + parc + "x de R$" + vlrParc);
+                }
+                totalPagamentos++;
+                System.out.println("Pagamento registrado!");
+            } catch (PagamentoInvalidoException e) {
+                System.out.println("Erro no pagamento: " + e.getMessage());
+            }
+        } else if (tipoPag.equals("convenio")) {
+            System.out.print("Nome do convenio: ");
+            String nomeConvenio = sc.nextLine();
+            Convenio convenio = buscarConvenioPorNome(nomeConvenio);
+
+            String nomeProfConsulta = consultas[idxConsulta].nomeProfissional;
+            int idxProfConsulta = buscarIndiceProfissional(nomeProfConsulta);
+            String especialidade = profissionais[idxProfConsulta].especialidade;
+
+            try {
+                pagamentos[totalPagamentos] = new PagamentoConvenio(idxConsulta, valor, tipoPag, convenio, especialidade);
+                totalPagamentos++;
+                System.out.println("Pagamento registrado!");
+            } catch (ConvenioNaoCobreException e) {
+                System.out.println("Erro no pagamento: " + e.getMessage());
             }
         } else {
-            pagamentos[totalPagamentos] = new Pagamento(idxConsulta, valor, tipoPag);
+            pagamentos[totalPagamentos] = new PagamentoDinheiro(idxConsulta, valor, tipoPag);
+            totalPagamentos++;
+            System.out.println("Pagamento registrado!");
         }
-        totalPagamentos++;
-        System.out.println("Pagamento registrado!");
     }
 
     public static void pagamentoAutomatico() {
@@ -813,17 +854,16 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
         double valorMulta = 0;
 
         double valorFinal;
-        if (temMulta == 1 && desconto == 0) {
-            valorFinal = Pagamento.calcularValor(valorBase);
-        } else if (temMulta == 1) {
-            valorFinal = Pagamento.calcularValor(valorBase, desconto);
+        double valorDescontado = valorBase - (valorBase * desconto / 100);
+        if (temMulta == 1) {
+            valorFinal = valorDescontado;
         } else {
             System.out.print("Valor da multa: ");
             valorMulta = Double.parseDouble(sc.nextLine());
-            valorFinal = Pagamento.calcularValor(valorBase, desconto, valorMulta);
+            valorFinal = valorDescontado + valorMulta;
         }
+        if (valorFinal < 0) valorFinal = 0;
 
-        // mostra detalhes
         System.out.println("Valor base: R$" + valorBase);
         System.out.println("Desconto: " + desconto + "%");
         if (valorMulta > 0) System.out.println("Multa: R$" + valorMulta);
@@ -834,18 +874,33 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
         String tipoPag = sc.nextLine();
 
         if (tipoPag.equals("cartao")) {
-            System.out.print("Parcelas (1 a 3): ");
+            System.out.print("Parcelas (1 a 6): ");
             int parc = Integer.parseInt(sc.nextLine());
-            if (parc < 1) parc = 1;
-            if (parc > 3) parc = 3;
-            pagamentos[totalPagamentos] = new Pagamento(idxConsulta, valorFinal, tipoPag, parc);
-            double vlrParc = Math.round((valorFinal / parc) * 100.0) / 100.0;
-            System.out.println("Pagamento em " + parc + "x de R$" + vlrParc);
+            try {
+                pagamentos[totalPagamentos] = new PagamentoCartao(idxConsulta, valorFinal, tipoPag, parc, true);
+                double vlrParc = Math.round((valorFinal / parc) * 100.0) / 100.0;
+                System.out.println("Pagamento em " + parc + "x de R$" + vlrParc);
+                totalPagamentos++;
+                System.out.println("Pagamento registrado!");
+            } catch (PagamentoInvalidoException e) {
+                System.out.println("Erro no pagamento: " + e.getMessage());
+            }
+        } else if (tipoPag.equals("convenio")) {
+            Convenio convenio = buscarConvenioPorNome(pacientes[idxPac].convenioNome);
+            String especialidade = profissionais[idxProf].especialidade;
+
+            try {
+                pagamentos[totalPagamentos] = new PagamentoConvenio(idxConsulta, valorBase, tipoPag, convenio, especialidade);
+                totalPagamentos++;
+                System.out.println("Pagamento registrado!");
+            } catch (ConvenioNaoCobreException e) {
+                System.out.println("Erro no pagamento: " + e.getMessage());
+            }
         } else {
-            pagamentos[totalPagamentos] = new Pagamento(idxConsulta, valorFinal, tipoPag);
+            pagamentos[totalPagamentos] = new PagamentoDinheiro(idxConsulta, valorFinal, tipoPag, true);
+            totalPagamentos++;
+            System.out.println("Pagamento registrado!");
         }
-        totalPagamentos++;
-        System.out.println("Pagamento registrado!");
     }
 
     public static void listarPagamentos() {
