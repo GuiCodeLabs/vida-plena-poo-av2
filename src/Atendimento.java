@@ -78,6 +78,13 @@ public class Atendimento {
         return consulta;
     }
 
+    public void registrarDadosClinicos(String observacoes, String diagnostico) {
+        prontuario.setObservacoes(observacoes);
+        prontuario.setDiagnostico(diagnostico);
+        this.observacoes = prontuario.getObservacoes();
+        this.diagnostico = prontuario.getDiagnostico();
+    }
+
     public String gerarResumoClinico() {
         String resumo = "Resumo clinico do atendimento";
 
