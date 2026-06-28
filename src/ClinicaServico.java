@@ -1,16 +1,15 @@
+import java.util.ArrayList;
+
 public class ClinicaServico {
-    private Paciente[] pacientes;
-    private int totalPacientes;
+    private ArrayList<Paciente> pacientes;
 
     public ClinicaServico() {
-        pacientes = new Paciente[100];
-        totalPacientes = 0;
+        pacientes = new ArrayList<Paciente>();
     }
 
     public void cadastrarPaciente(Paciente paciente) {
-        if (paciente != null && totalPacientes < pacientes.length) {
-            pacientes[totalPacientes] = paciente;
-            totalPacientes++;
+        if (paciente != null) {
+            pacientes.add(paciente);
         }
     }
 
@@ -19,15 +18,11 @@ public class ClinicaServico {
         if (indice == -1) {
             return null;
         }
-        return pacientes[indice];
+        return pacientes.get(indice);
     }
 
     public Paciente[] listarPacientes() {
-        Paciente[] resultado = new Paciente[totalPacientes];
-        for (int i = 0; i < totalPacientes; i++) {
-            resultado[i] = pacientes[i];
-        }
-        return resultado;
+        return pacientes.toArray(new Paciente[pacientes.size()]);
     }
 
     public void desativarPaciente(String cpf) {
@@ -42,12 +37,12 @@ public class ClinicaServico {
     }
 
     public int getTotalPacientes() {
-        return totalPacientes;
+        return pacientes.size();
     }
 
     private int buscarIndicePaciente(String cpf) {
-        for (int i = 0; i < totalPacientes; i++) {
-            if (pacientes[i].getCpf().equals(cpf)) {
+        for (int i = 0; i < pacientes.size(); i++) {
+            if (pacientes.get(i).getCpf().equals(cpf)) {
                 return i;
             }
         }
