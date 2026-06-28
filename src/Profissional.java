@@ -14,8 +14,24 @@ public abstract class Profissional extends Pessoa {
         horariosDisponiveis = new ArrayList<>();
     }
 
+    public Profissional(String nome, String cpf, String especialidade) {
+        super(nome, cpf);
+        setEspecialidade(especialidade);
+        setRegistroProfissional("");
+        setValorConsulta(0);
+        horariosDisponiveis = new ArrayList<>();
+    }
+
     public Profissional(String nome, String especialidade, String registroProfissional, double valorConsulta) {
         super(nome, "");
+        setEspecialidade(especialidade);
+        setRegistroProfissional(registroProfissional);
+        setValorConsulta(valorConsulta);
+        horariosDisponiveis = new ArrayList<>();
+    }
+
+    public Profissional(String nome, String cpf, String especialidade, String registroProfissional, double valorConsulta) {
+        super(nome, cpf);
         setEspecialidade(especialidade);
         setRegistroProfissional(registroProfissional);
         setValorConsulta(valorConsulta);
@@ -31,6 +47,15 @@ public abstract class Profissional extends Pessoa {
         setHorariosDisponiveis(horarios);
     }
 
+    public Profissional(String nome, String cpf, String especialidade, String registroProfissional,
+                        double valorConsulta, ArrayList<HorarioDisponivel> horarios) {
+        super(nome, cpf);
+        setEspecialidade(especialidade);
+        setRegistroProfissional(registroProfissional);
+        setValorConsulta(valorConsulta);
+        setHorariosDisponiveis(horarios);
+    }
+
     public String getEspecialidade() {
         return especialidade;
     }
@@ -39,10 +64,11 @@ public abstract class Profissional extends Pessoa {
         if (especialidade == null || especialidade.trim().isEmpty()) {
             throw new IllegalArgumentException("Especialidade nao pode ser vazia.");
         }
-        if (!especialidadeValida(especialidade)) {
+        String especialidadeTratada = especialidade.trim().toLowerCase();
+        if (!especialidadeValida(especialidadeTratada)) {
             throw new IllegalArgumentException("Especialidade invalida.");
         }
-        this.especialidade = especialidade;
+        this.especialidade = especialidadeTratada;
     }
 
     public String getRegistroProfissional() {
@@ -104,6 +130,15 @@ public abstract class Profissional extends Pessoa {
         return false;
     }
 
+    public boolean atendeNoHorario(String dia, String turno) {
+        for (HorarioDisponivel horario : horariosDisponiveis) {
+            if (horario.atendeNoHorario(dia, turno)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean especialidadeValida(String esp) {
         if (esp == null) return false;
         if (esp.equals("clinica geral")) return true;
@@ -119,8 +154,10 @@ public abstract class Profissional extends Pessoa {
             if (i > 0) horarios = horarios + ", ";
             horarios = horarios + horariosDisponiveis.get(i).exibirResumo();
         }
+        String cpf = getCpf().equals("") ? "-" : getCpf();
 
-        return "Nome: " + getNome() + " | Espec: " + especialidade + " | Reg: " + registroProfissional
-                + " | Valor: R$" + valorConsulta + " | Horarios: " + horarios;
+        return "Nome: " + getNome() + " | CPF: " + cpf + " | Espec: " + especialidade
+                + " | Reg: " + registroProfissional + " | Valor: R$" + valorConsulta
+                + " | Horarios: " + (horarios.isEmpty() ? "nao definido" : horarios);
     }
 }
