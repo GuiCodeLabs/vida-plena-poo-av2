@@ -12,7 +12,10 @@ public abstract class Pagamento {
         this.parcelas = parcelas;
         this.statusPagamento = "Pendente";
     }
-
+    // Metodo abstrato: cada subclasse (Dinheiro, Cartao, Convenio) e obrigada a
+    // implementar sua propria regra de calculo. E a base do polimorfismo:
+    // em tempo de execucao, o Java decide qual versao chamar de acordo com o
+    // tipo real do objeto guardado na variavel do tipo Pagamento.
     public abstract double calcularValorFinal(double valorBase);
 
     public String exibirResumo() {
