@@ -1,5 +1,6 @@
 /**
- * Exceção personalizada para tratar indisponibilidade do profissional ou conflito de horário.
+ * Exceção personalizada utilizada para indicar que o profissional
+ * não possui disponibilidade no horário solicitado para a consulta.
  */
 public class HorarioIndisponivelException extends Exception {
     public HorarioIndisponivelException(String mensagem) {
