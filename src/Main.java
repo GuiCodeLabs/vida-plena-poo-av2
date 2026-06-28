@@ -179,8 +179,6 @@ public class Main {
         return -1;
     }
 
-    // ---- PROFISSIONAIS ----
-
     public static void menuProfissionais() {
         int op = -1;
         while (op != 0) {
@@ -291,7 +289,7 @@ public class Main {
         String esp = sc.nextLine();
         boolean achou = false;
         for (int i = 0; i < totalProfissionais; i++) {
-            if (profissionais[i].especialidade.equals(esp)) {
+            if (profissionais[i].getEspecialidade().equals(esp)) {
                 System.out.println(profissionais[i].exibirResumo());
                 achou = true;
             }
@@ -355,7 +353,7 @@ public class Main {
             System.out.println("Profissional nao encontrado.");
             return;
         }
-        if (profissionais[idxProf].valorConsulta == 0) {
+        if (profissionais[idxProf].getValorConsulta() == 0) {
             System.out.println("Profissional sem valor definido. Nao pode agendar.");
             return;
         }
@@ -426,11 +424,10 @@ public class Main {
 
         String diaSemana = descobrirDiaSemana(data);
 
-        // procura profissional disponivel
         int idxProf = -1;
         for (int i = 0; i < totalProfissionais; i++) {
-            if (profissionais[i].especialidade.equals(esp)
-                    && profissionais[i].valorConsulta > 0
+            if (profissionais[i].getEspecialidade().equals(esp)
+                    && profissionais[i].getValorConsulta() > 0
                     && profissionais[i].atendeNoDia(diaSemana)
                     && !temConflito(profissionais[i].nome, data, horario)) {
                 idxProf = i;
@@ -792,12 +789,10 @@ public class Main {
             return;
         }
 
-        // obtem valor do profissional
         String nomeProf = consultas[idxConsulta].nomeProfissional;
         int idxProf = buscarIndiceProfissional(nomeProf);
-        double valorBase = profissionais[idxProf].valorConsulta;
+        double valorBase = profissionais[idxProf].getValorConsulta();
 
-        // verifica convenio e tipo
         String cpfPac = consultas[idxConsulta].cpfPaciente;
         int idxPac = buscarIndicePaciente(cpfPac);
 
