@@ -5,6 +5,7 @@ import java.util.ArrayList;
  * relacionadas ao gerenciamento de consultas da clínica.
  */
 public class ClinicaServico {
+    private static ArrayList<Atendimento> atendimentos = new ArrayList<Atendimento>();
 
     // Localiza um paciente pelo CPF para validar operações envolvendo consultas.
     public static int buscarIndicePaciente(Paciente[] pacientes, int totalPacientes, String cpf) {
@@ -175,6 +176,29 @@ public class ClinicaServico {
         }
 
         throw new ConsultaNaoEncontradaException("Consulta não encontrada.");
+    }
+
+    public static Atendimento registrarAtendimento(
+            Consulta consulta,
+            String observacoes,
+            String diagnostico,
+            String procedimentoInicial
+    ) {
+        if (consulta == null) {
+            return null;
+        }
+
+        Atendimento atendimento = new Atendimento(consulta, observacoes, diagnostico);
+        atendimento.registrarDadosClinicos(observacoes, diagnostico);
+
+        if (procedimentoInicial != null && !procedimentoInicial.trim().equals("")) {
+            atendimento.adicionarProcedimento(procedimentoInicial.trim());
+        }
+
+        atendimento.finalizarAtendimento();
+        atendimentos.add(atendimento);
+
+        return atendimento;
     }
 
     // Executa as validações antes de cancelar uma consulta.
