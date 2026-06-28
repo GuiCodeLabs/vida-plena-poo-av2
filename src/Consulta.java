@@ -1,3 +1,6 @@
+// A classe Consulta implementa a interface Agendavel,
+// garantindo que todas as consultas possuam operações
+// básicas de agendamento, cancelamento e remarcação.
 public class Consulta implements Agendavel {
 
     public String cpfPaciente;
@@ -7,11 +10,15 @@ public class Consulta implements Agendavel {
     public String tipo;
     public String status;
 
+    // SOBRECARGA: mesmo nome (Consulta), parâmetros diferentes.
+    // Resolvido em tempo de compilação.
     public Consulta(String cpfPaciente, String nomeProfissional, String data, String horario) {
         this(cpfPaciente, nomeProfissional, data, horario, "inicial");
     }
 
-    public Consulta(String cpfPaciente, String nomeProfissional, String data,String horario, String tipo) {
+    // SOBRECARGA: construtor com parâmetro extra para informar o tipo da consulta.
+    // Resolvido em tempo de compilação.
+    public Consulta(String cpfPaciente, String nomeProfissional, String data, String horario, String tipo) {
         this.cpfPaciente = cpfPaciente;
         this.nomeProfissional = nomeProfissional;
         this.data = data;
@@ -20,8 +27,9 @@ public class Consulta implements Agendavel {
         this.status = "agendada";
     }
 
-
-    public Consulta(String cpfPaciente, String nomeProfissional,String data, String horario,String tipo, String status) {
+    // SOBRECARGA: construtor com parâmetro extra para informar também o status.
+    // Resolvido em tempo de compilação.
+    public Consulta(String cpfPaciente, String nomeProfissional, String data, String horario, String tipo, String status) {
         this.cpfPaciente = cpfPaciente;
         this.nomeProfissional = nomeProfissional;
         this.data = data;
@@ -30,28 +38,77 @@ public class Consulta implements Agendavel {
         this.status = status;
     }
 
+    // SOBRESCRITA: mesmo nome e parâmetros do método da interface Agendavel.
+    // A classe Consulta redefine o comportamento em tempo de execução.
     @Override
     public void agendar() {
         this.status = "agendada";
     }
 
+    // SOBRECARGA: mesmo nome do método agendar, mas com parâmetros diferentes.
+    // Resolvido em tempo de compilação.
+    public void agendar(String data, String horario) {
+        this.data = data;
+        this.horario = horario;
+        this.status = "agendada";
+    }
+
+    // SOBRESCRITA: implementação do método cancelar() definido em Agendavel.
     @Override
     public void cancelar() {
-        this.status = "cancelada";
+        if (status.equals("realizada")) {
+            System.out.println("Não é possível cancelar uma consulta já realizada.");
+            return;
+        }
+
+        if (status.equals("cancelada")) {
+            System.out.println("A consulta já está cancelada.");
+            return;
+        }
+
+        status = "cancelada";
     }
-// Sobrecarga do método cancelar
+
+    // SOBRECARGA: mesmo nome do método cancelar, mas recebe o motivo.
+    // Resolvido em tempo de compilação.
     public String cancelar(String motivo) {
         cancelar();
         return "Consulta cancelada. Motivo: " + motivo;
     }
 
+    // SOBRESCRITA: implementação do método remarcar() definido em Agendavel.
     @Override
     public void remarcar() {
+        if (!status.equals("agendada")) {
+            System.out.println("Apenas consultas agendadas podem ser remarcadas.");
+            return;
+        }
+
+        status = "remarcada";
+    }
+
+    // SOBRECARGA: mesmo nome do método remarcar, mas recebe nova data e novo horário.
+    // Resolvido em tempo de compilação.
+    public void remarcar(String novaData, String novoHorario) {
+
+        if (!status.equals("agendada")) {
+            System.out.println("Apenas consultas agendadas podem ser remarcadas.");
+            return;
+        }
+
+        this.data = novaData;
+        this.horario = novoHorario;
         this.status = "remarcada";
     }
 
     public void realizar() {
-        this.status = "realizada";
+
+        if (!status.equals("agendada")) {
+            System.out.println("Apenas consultas agendadas podem ser realizadas.");
+            return;
+        }
+
+        status = "realizada";
     }
 
     public String exibirResumo() {
