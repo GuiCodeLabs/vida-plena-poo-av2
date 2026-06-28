@@ -397,27 +397,24 @@ public static void agendarPorEspecialidade() {
 
         String diaSemana = descobrirDiaSemana(data);
 
-        int idxProf = -1;
+        ClinicaServico.agendarConsultaPorEspecialidade(
+                consultas,
+                pacientes,
+                totalPacientes,
+                profissionais,
+                totalProfissionais,
+                cpf,
+                especialidade,
+                data,
+                horario,
+                diaSemana
+        );
 
-        for (int i = 0; i < totalProfissionais; i++) {
-            if (profissionais[i].especialidade.equals(esp)
-                    && profissionais[i].valorConsulta > 0
-                    && profissionais[i].atendeNoDia(diaSemana)
-                    && !temConflito(profissionais[i].nome, data, horario)) {
-                idxProf = i;
-                break;
-            }
-        }
+        System.out.println("Consulta agendada por especialidade com sucesso!");
 
-        if (idxProf == -1) {
-            throw new HorarioIndisponivelException("Nenhum profissional disponível para essa especialidade.");
-        }
-
-        consultas.add(new Consulta(cpf, profissionais[idxProf].nome, data, horario));
-
-        System.out.println("Consulta agendada com " + profissionais[idxProf].nome + "!");
-
-    } catch (ConsultaNaoEncontradaException | HorarioIndisponivelException | OperacaoInvalidaException e) {
+    } catch (ConsultaNaoEncontradaException |
+            PacienteInativoException |
+            HorarioIndisponivelException e) {
         System.out.println(e.getMessage());
     } finally {
         System.out.println("Operação de agendamento por especialidade finalizada.");
