@@ -2,6 +2,8 @@ import java.util.Scanner;
 import java.util.ArrayList;
 
 public class Main {
+    static ClinicaServico servico = new ClinicaServico();
+
     static Paciente[] pacientes = new Paciente[100];
     static int totalPacientes = 0;
 
@@ -82,8 +84,7 @@ public class Main {
         System.out.print("CPF: ");
         String cpf = sc.nextLine();
 
-        // verifica se ja existe
-        if (buscarIndicePaciente(cpf) != -1) {
+        if (servico.pacienteExiste(cpf)) {
             System.out.println("CPF ja cadastrado!");
             return;
         }
@@ -91,14 +92,16 @@ public class Main {
         System.out.print("Tipo (1-Minimo / 2-Com idade e tel / 3-Completo): ");
         int tipo = Integer.parseInt(sc.nextLine());
 
+        Paciente paciente;
+
         if (tipo == 1) {
-            pacientes[totalPacientes] = new Paciente(nome, cpf);
+            paciente = new Paciente(nome, cpf);
         } else if (tipo == 2) {
             System.out.print("Idade: ");
             int idade = Integer.parseInt(sc.nextLine());
             System.out.print("Telefone: ");
             String tel = sc.nextLine();
-            pacientes[totalPacientes] = new Paciente(nome, cpf, idade, tel);
+            paciente = new Paciente(nome, cpf, idade, tel);
         } else {
             System.out.print("Idade: ");
             int idade = Integer.parseInt(sc.nextLine());
@@ -106,9 +109,10 @@ public class Main {
             String tel = sc.nextLine();
             System.out.print("Convenio: ");
             String conv = sc.nextLine();
-            pacientes[totalPacientes] = new Paciente(nome, cpf, idade, tel, conv);
+            paciente = new Paciente(nome, cpf, idade, tel, conv);
         }
-        totalPacientes++;
+        servico.cadastrarPaciente(paciente);
+        sincronizarPacientes();
         System.out.println("Paciente cadastrado com sucesso!");
     }
 
@@ -142,11 +146,11 @@ public class Main {
     public static void buscarPaciente() {
         System.out.print("CPF: ");
         String cpf = sc.nextLine();
-        int idx = buscarIndicePaciente(cpf);
-        if (idx == -1) {
+        Paciente paciente = servico.buscarPacientePorCpf(cpf);
+        if (paciente == null) {
             System.out.println("Paciente nao encontrado.");
         } else {
-            System.out.println(pacientes[idx].exibirResumo());
+            System.out.println(paciente.exibirResumo());
         }
     }
 
@@ -177,6 +181,11 @@ public class Main {
             if (pacientes[i].getCpf().equals(cpf)) return i;
         }
         return -1;
+    }
+
+    public static void sincronizarPacientes() {
+        pacientes = servico.listarPacientes();
+        totalPacientes = servico.getTotalPacientes();
     }
 
     // ---- PROFISSIONAIS ----
