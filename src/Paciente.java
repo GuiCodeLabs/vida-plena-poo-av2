@@ -1,8 +1,11 @@
 public class Paciente extends Pessoa {
     private int idade;
+    // ASSOCIAÇÃO: Paciente conhece Convênio, mas ambos existem independentemente.
     private Convenio convenio;
     private boolean ativo;
 
+    // SOBRECARGA: construtores com o mesmo nome, mas parâmetros diferentes,
+    // permitindo cadastro mínimo, cadastro com dados adicionais e cadastro completo.
     public Paciente(String nome, String cpf) {
         super(nome, cpf);
         setIdade(0);
@@ -31,6 +34,8 @@ public class Paciente extends Pessoa {
         setAtivo(true);
     }
 
+    // SOBRECARGA: métodos complementar com parâmetros diferentes para atualizar
+    // dados do paciente em níveis diferentes de detalhe.
     public void complementar(int idade, String telefone) {
         setIdade(idade);
         setTelefone(telefone);
@@ -57,7 +62,7 @@ public class Paciente extends Pessoa {
     }
 
     public void setIdade(int idade) {
-        if (idade >= 0) {
+        if (idade >= 0 && idade <= 130) {
             this.idade = idade;
         }
     }
@@ -97,6 +102,8 @@ public class Paciente extends Pessoa {
         this.ativo = ativo;
     }
 
+    // SOBRESCRITA: Paciente redefine o método exibirResumo() herdado de Pessoa
+    // para mostrar dados próprios, como idade, status ativo e convênio.
     @Override
     public String exibirResumo() {
         String status = "Sim";

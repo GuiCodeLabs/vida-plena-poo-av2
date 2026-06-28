@@ -4,9 +4,6 @@ import java.util.ArrayList;
 public class Main {
     static ClinicaServico servico = new ClinicaServico();
 
-    static Paciente[] pacientes = new Paciente[100];
-    static int totalPacientes = 0;
-
     static Profissional[] profissionais = new Profissional[50];
     static int totalProfissionais = 0;
 
@@ -24,8 +21,8 @@ public class Main {
     static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        int opcao = -1;
-        while (opcao != 0) {
+        Integer opcao = -1;
+        while (opcao.intValue() != 0) {
             System.out.println("\n=== CLINICA VIDAPLENA ===");
             System.out.println("1 - Pacientes");
             System.out.println("2 - Profissionais");
@@ -34,10 +31,13 @@ public class Main {
             System.out.println("5 - Pagamentos");
             System.out.println("6 - Relatorios");
             System.out.println("0 - Sair");
-            System.out.print("Escolha: ");
-            opcao = Integer.parseInt(sc.nextLine());
+            opcao = lerInteiro("Escolha: ");
+            if (opcao == null) {
+                opcao = -1;
+                continue;
+            }
 
-            switch (opcao) {
+            switch (opcao.intValue()) {
                 case 1: menuPacientes(); break;
                 case 2: menuProfissionais(); break;
                 case 3: menuConsultas(); break;
@@ -54,8 +54,8 @@ public class Main {
     // ---- PACIENTES ----
 
     public static void menuPacientes() {
-        int op = -1;
-        while (op != 0) {
+        Integer op = -1;
+        while (op.intValue() != 0) {
             System.out.println("\n--- PACIENTES ---");
             System.out.println("1 - Cadastrar");
             System.out.println("2 - Complementar cadastro");
@@ -63,10 +63,13 @@ public class Main {
             System.out.println("4 - Listar todos");
             System.out.println("5 - Desativar");
             System.out.println("0 - Voltar");
-            System.out.print("Opcao: ");
-            op = Integer.parseInt(sc.nextLine());
+            op = lerInteiro("Opcao: ");
+            if (op == null) {
+                op = -1;
+                continue;
+            }
 
-            switch (op) {
+            switch (op.intValue()) {
                 case 1: cadastrarPaciente(); break;
                 case 2: complementarPaciente(); break;
                 case 3: buscarPaciente(); break;
@@ -79,104 +82,99 @@ public class Main {
     }
 
     public static void cadastrarPaciente() {
-        System.out.print("Nome: ");
-        String nome = sc.nextLine();
-        System.out.print("CPF: ");
-        String cpf = sc.nextLine();
+        try {
+            System.out.print("Nome: ");
+            String nome = sc.nextLine();
+            System.out.print("CPF: ");
+            String cpf = sc.nextLine();
 
-        if (servico.pacienteExiste(cpf)) {
-            System.out.println("CPF ja cadastrado!");
-            return;
-        }
-
-        System.out.print("Tipo (1-Minimo / 2-Com idade e tel / 3-Completo): ");
-        int tipo = Integer.parseInt(sc.nextLine());
-
-        Paciente paciente;
-
-        if (tipo == 1) {
-            paciente = new Paciente(nome, cpf);
-        } else if (tipo == 2) {
-            Integer idade = lerInteiro("Idade: ");
-            if (idade == null) {
+            Integer tipo = lerInteiro("Tipo (1-Minimo / 2-Com idade e tel / 3-Completo): ");
+            if (tipo == null) {
                 return;
             }
-            System.out.print("Telefone: ");
-            String tel = sc.nextLine();
-            paciente = new Paciente(nome, cpf, idade.intValue(), tel);
-        } else if (tipo == 3) {
-            Integer idade = lerInteiro("Idade: ");
-            if (idade == null) {
+
+            if (tipo.intValue() == 1) {
+                servico.cadastrarPaciente(nome, cpf);
+            } else if (tipo.intValue() == 2) {
+                Integer idade = lerInteiro("Idade: ");
+                if (idade == null) {
+                    return;
+                }
+                System.out.print("Telefone: ");
+                String tel = sc.nextLine();
+                servico.cadastrarPaciente(nome, cpf, idade.intValue(), tel);
+            } else if (tipo.intValue() == 3) {
+                Integer idade = lerInteiro("Idade: ");
+                if (idade == null) {
+                    return;
+                }
+                System.out.print("Telefone: ");
+                String tel = sc.nextLine();
+                System.out.print("Convenio: ");
+                String conv = sc.nextLine();
+                Convenio convenio = criarConvenio(conv);
+                servico.cadastrarPaciente(nome, cpf, idade.intValue(), tel, convenio);
+            } else {
+                System.out.println("Tipo de cadastro invalido.");
                 return;
             }
-            System.out.print("Telefone: ");
-            String tel = sc.nextLine();
-            System.out.print("Convenio: ");
-            String conv = sc.nextLine();
-            Convenio convenio = criarConvenio(conv);
-            paciente = new Paciente(nome, cpf, idade.intValue(), tel, convenio);
-        } else {
-            System.out.println("Tipo de cadastro invalido.");
-            return;
-        }
-        if (servico.cadastrarPaciente(paciente)) {
-            sincronizarPacientes();
             System.out.println("Paciente cadastrado com sucesso!");
-        } else {
-            System.out.println("Nao foi possivel cadastrar paciente.");
+        } catch (OperacaoInvalidaException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("--- Operacao de paciente finalizada ---");
         }
     }
 
     public static void complementarPaciente() {
-        System.out.print("CPF: ");
-        String cpf = sc.nextLine();
-        Paciente paciente = servico.buscarPacientePorCpf(cpf);
-        if (paciente == null) {
-            System.out.println("Paciente nao encontrado.");
-            return;
-        }
+        try {
+            System.out.print("CPF: ");
+            String cpf = sc.nextLine();
 
-        Integer tipo = lerInteiro("Vai informar convenio? (1-Nao / 2-Sim): ");
-        if (tipo == null) {
-            return;
-        }
+            Integer tipo = lerInteiro("Vai informar convenio? (1-Nao / 2-Sim): ");
+            if (tipo == null) {
+                return;
+            }
 
-        Integer idade = lerInteiro("Idade: ");
-        if (idade == null) {
-            return;
-        }
-        System.out.print("Telefone: ");
-        String tel = sc.nextLine();
+            Integer idade = lerInteiro("Idade: ");
+            if (idade == null) {
+                return;
+            }
+            System.out.print("Telefone: ");
+            String tel = sc.nextLine();
 
-        boolean atualizado;
-        if (tipo.intValue() == 1) {
-            atualizado = servico.complementarPaciente(cpf, idade.intValue(), tel);
-        } else if (tipo.intValue() == 2) {
-            System.out.print("Convenio: ");
-            String conv = sc.nextLine();
-            Convenio convenio = criarConvenio(conv);
-            atualizado = servico.complementarPaciente(cpf, idade.intValue(), tel, convenio);
-        } else {
-            System.out.println("Tipo de complementacao invalido.");
-            return;
-        }
+            if (tipo.intValue() == 1) {
+                servico.complementarPaciente(cpf, idade.intValue(), tel);
+            } else if (tipo.intValue() == 2) {
+                System.out.print("Convenio: ");
+                String conv = sc.nextLine();
+                Convenio convenio = criarConvenio(conv);
+                servico.complementarPaciente(cpf, idade.intValue(), tel, convenio);
+            } else {
+                System.out.println("Tipo de complementacao invalido.");
+                return;
+            }
 
-        if (atualizado) {
-            sincronizarPacientes();
             System.out.println("Cadastro atualizado!");
-        } else {
-            System.out.println("Nao foi possivel atualizar cadastro.");
+        } catch (PacienteNaoEncontradoException e) {
+            System.out.println(e.getMessage());
+        } catch (OperacaoInvalidaException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("--- Operacao de paciente finalizada ---");
         }
     }
 
     public static void buscarPaciente() {
         System.out.print("CPF: ");
         String cpf = sc.nextLine();
-        Paciente paciente = servico.buscarPacientePorCpf(cpf);
-        if (paciente == null) {
-            System.out.println("Paciente nao encontrado.");
-        } else {
+        try {
+            Paciente paciente = servico.buscarPacientePorCpf(cpf);
             System.out.println(paciente.exibirResumo());
+        } catch (PacienteNaoEncontradoException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("--- Operacao de paciente finalizada ---");
         }
     }
 
@@ -194,26 +192,16 @@ public class Main {
     public static void desativarPaciente() {
         System.out.print("CPF: ");
         String cpf = sc.nextLine();
-        Paciente paciente = servico.buscarPacientePorCpf(cpf);
-        if (paciente == null) {
-            System.out.println("Paciente nao encontrado.");
-        } else {
+        try {
             servico.desativarPaciente(cpf);
-            sincronizarPacientes();
             System.out.println("Paciente desativado.");
+        } catch (PacienteNaoEncontradoException e) {
+            System.out.println(e.getMessage());
+        } catch (PacienteInativoException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("--- Operacao de paciente finalizada ---");
         }
-    }
-
-    public static int buscarIndicePaciente(String cpf) {
-        for (int i = 0; i < totalPacientes; i++) {
-            if (pacientes[i].getCpf().equals(cpf)) return i;
-        }
-        return -1;
-    }
-
-    public static void sincronizarPacientes() {
-        pacientes = servico.listarPacientes();
-        totalPacientes = servico.getTotalPacientes();
     }
 
     public static Integer lerInteiro(String mensagem) {
@@ -393,14 +381,14 @@ public static void agendarComProfissional() {
     try {
         System.out.print("CPF do paciente: ");
         String cpf = sc.nextLine();
-
-        int idxPac = buscarIndicePaciente(cpf);
-        if (idxPac == -1) {
-            throw new ConsultaNaoEncontradaException("Paciente não encontrado para agendamento.");
-        }
-if (!pacientes[idxPac].isAtivo()) {
-    System.out.println("Paciente inativo. Nao e possivel agendar.");
-    return;
+        try {
+            servico.buscarPacienteAtivo(cpf);
+        } catch (PacienteNaoEncontradoException e) {
+            System.out.println(e.getMessage());
+            return;
+        } catch (PacienteInativoException e) {
+            System.out.println(e.getMessage());
+            return;
 
         }
 
@@ -473,14 +461,14 @@ public static void agendarPorEspecialidade() {
     try {
         System.out.print("CPF do paciente: ");
         String cpf = sc.nextLine();
-
-        int idxPac = buscarIndicePaciente(cpf);
-        if (idxPac == -1) {
-            throw new ConsultaNaoEncontradaException("Paciente não encontrado para agendamento.");
-        }
-if (!pacientes[idxPac].isAtivo()) {
-    System.out.println("Paciente inativo. Nao e possivel agendar.");
-    return;
+        try {
+            servico.buscarPacienteAtivo(cpf);
+        } catch (PacienteNaoEncontradoException e) {
+            System.out.println(e.getMessage());
+            return;
+        } catch (PacienteInativoException e) {
+            System.out.println(e.getMessage());
+            return;
 
         }
 
@@ -927,9 +915,13 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
 
         // verifica convenio e tipo
         String cpfPac = consultas.get(idxConsulta).cpfPaciente;
-        int idxPac = buscarIndicePaciente(cpfPac);
-
-        boolean temConvenio = !pacientes[idxPac].getConvenioNome().equals("");
+        boolean temConvenio;
+        try {
+            temConvenio = servico.pacienteTemConvenio(cpfPac);
+        } catch (PacienteNaoEncontradoException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
         boolean ehRetorno = consultas.get(idxConsulta).tipo.equals("retorno");
 
         double desconto = 0;
@@ -986,6 +978,10 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
         }
     }
 
+    public static Consulta[] consultasComoArray() {
+        return consultas.toArray(new Consulta[consultas.size()]);
+    }
+
     // ---- RELATORIOS ----
 
     public static void menuRelatorios() {
@@ -1002,22 +998,22 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
 
             switch (op) {
                 case 1:
-                    Relatorio.gerarRelatorio(consultas, totalConsultas, atendimentos, totalAtendimentos);
+                    Relatorio.gerarRelatorio(consultasComoArray(), consultas.size(), atendimentos, totalAtendimentos);
                     break;
                 case 2:
                     System.out.print("Nome do profissional: ");
                     String nome = sc.nextLine();
-                    Relatorio.gerarRelatorio(consultas, totalConsultas, atendimentos, totalAtendimentos, nome);
+                    Relatorio.gerarRelatorio(consultasComoArray(), consultas.size(), atendimentos, totalAtendimentos, nome);
                     break;
                 case 3:
                     System.out.print("Data inicio (DD/MM/AAAA): ");
                     String ini = sc.nextLine();
                     System.out.print("Data fim (DD/MM/AAAA): ");
                     String fim = sc.nextLine();
-                    Relatorio.gerarRelatorio(consultas, totalConsultas, atendimentos, totalAtendimentos, ini, fim);
+                    Relatorio.gerarRelatorio(consultasComoArray(), consultas.size(), atendimentos, totalAtendimentos, ini, fim);
                     break;
                 case 4:
-                    Relatorio.gerarResumoFinanceiro(consultas, totalConsultas, pagamentos, totalPagamentos, multas, totalMultas);
+                    Relatorio.gerarResumoFinanceiro(consultasComoArray(), consultas.size(), pagamentos, totalPagamentos, multas, totalMultas);
                     break;
                 case 0: break;
                 default: System.out.println("Opcao invalida!"); break;

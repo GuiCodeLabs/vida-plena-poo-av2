@@ -30,8 +30,9 @@ public abstract class Pessoa {
     }
 
     public void setCpf(String cpf) {
-        if (cpf != null && !cpf.trim().equals("")) {
-            this.cpf = cpf.trim();
+        String cpfTratado = extrairDigitos(cpf);
+        if (!cpfTratado.equals("")) {
+            this.cpf = cpfTratado;
         }
     }
 
@@ -40,11 +41,7 @@ public abstract class Pessoa {
     }
 
     public void setTelefone(String telefone) {
-        if (telefone == null) {
-            this.telefone = "";
-        } else {
-            this.telefone = telefone.trim();
-        }
+        this.telefone = extrairDigitos(telefone);
     }
 
     public String getDataNascimento() {
@@ -57,6 +54,20 @@ public abstract class Pessoa {
         } else {
             this.dataNascimento = dataNascimento.trim();
         }
+    }
+
+    private String extrairDigitos(String valor) {
+        if (valor == null) {
+            return "";
+        }
+        String digitos = "";
+        for (int i = 0; i < valor.length(); i++) {
+            char caractere = valor.charAt(i);
+            if (Character.isDigit(caractere)) {
+                digitos = digitos + caractere;
+            }
+        }
+        return digitos;
     }
 
     public abstract String exibirResumo();

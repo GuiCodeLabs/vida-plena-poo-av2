@@ -1,8 +1,12 @@
 import java.util.ArrayList;
 
+// Convênio é uma entidade independente: pode existir no sistema mesmo sem estar
+// associado a um paciente específico.
 public class Convenio {
     private String nome;
     private double percentualCobertura;
+    // ArrayList<String>: armazena as especialidades cobertas pelo convênio
+    // e permite percorrer a lista ao verificar se uma especialidade é atendida.
     private ArrayList<String> especialidadesCobertas;
 
     public Convenio(String nome, double percentualCobertura) {
