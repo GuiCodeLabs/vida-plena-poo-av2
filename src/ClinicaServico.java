@@ -1,12 +1,15 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class ClinicaServico {
     private ArrayList<Paciente> pacientes;
+    private HashMap<String, Paciente> pacientesPorCpf;
     private HashSet<String> cpfsCadastrados;
 
     public ClinicaServico() {
         pacientes = new ArrayList<Paciente>();
+        pacientesPorCpf = new HashMap<String, Paciente>();
         cpfsCadastrados = new HashSet<String>();
     }
 
@@ -21,15 +24,12 @@ public class ClinicaServico {
         }
 
         pacientes.add(paciente);
+        pacientesPorCpf.put(cpf, paciente);
         cpfsCadastrados.add(cpf);
     }
 
     public Paciente buscarPacientePorCpf(String cpf) {
-        int indice = buscarIndicePaciente(cpf);
-        if (indice == -1) {
-            return null;
-        }
-        return pacientes.get(indice);
+        return pacientesPorCpf.get(normalizarCpf(cpf));
     }
 
     public Paciente[] listarPacientes() {
@@ -44,21 +44,11 @@ public class ClinicaServico {
     }
 
     public boolean pacienteExiste(String cpf) {
-        return cpfsCadastrados.contains(normalizarCpf(cpf));
+        return pacientesPorCpf.containsKey(normalizarCpf(cpf));
     }
 
     public int getTotalPacientes() {
         return pacientes.size();
-    }
-
-    private int buscarIndicePaciente(String cpf) {
-        String cpfBusca = normalizarCpf(cpf);
-        for (int i = 0; i < pacientes.size(); i++) {
-            if (pacientes.get(i).getCpf().equals(cpfBusca)) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     private String normalizarCpf(String cpf) {
