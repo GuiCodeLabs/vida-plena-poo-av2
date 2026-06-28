@@ -13,62 +13,53 @@ public class ClinicaServico {
         cpfsCadastrados = new HashSet<String>();
     }
 
-    public boolean cadastrarPaciente(Paciente paciente) {
-        if (paciente == null) {
-            return false;
-        }
-
+    public void cadastrarPaciente(Paciente paciente) throws OperacaoInvalidaException {
+        validarPacienteParaCadastro(paciente);
         String cpf = normalizarCpf(paciente.getCpf());
-        if (cpf.equals("") || cpfsCadastrados.contains(cpf)) {
-            return false;
-        }
-
         pacientes.add(paciente);
         pacientesPorCpf.put(cpf, paciente);
         cpfsCadastrados.add(cpf);
-        return true;
     }
 
-    public Paciente buscarPacientePorCpf(String cpf) {
-        return pacientesPorCpf.get(normalizarCpf(cpf));
+    public Paciente buscarPacientePorCpf(String cpf) throws PacienteNaoEncontradoException {
+        Paciente paciente = pacientesPorCpf.get(normalizarCpf(cpf));
+        if (paciente == null) {
+            throw new PacienteNaoEncontradoException("Paciente nao encontrado.");
+        }
+        return paciente;
     }
 
     public Paciente[] listarPacientes() {
         return pacientes.toArray(new Paciente[pacientes.size()]);
     }
 
-    public void desativarPaciente(String cpf) {
+    public void desativarPaciente(String cpf) throws PacienteNaoEncontradoException, PacienteInativoException {
         Paciente paciente = buscarPacientePorCpf(cpf);
-        if (paciente != null) {
-            paciente.desativar();
+        if (!paciente.isAtivo()) {
+            throw new PacienteInativoException("Paciente ja esta inativo.");
         }
+        paciente.desativar();
     }
 
-    public boolean complementarPaciente(String cpf, int idade, String telefone) {
+    public void complementarPaciente(String cpf, int idade, String telefone)
+            throws PacienteNaoEncontradoException, OperacaoInvalidaException {
+        validarComplementacao(idade, telefone);
         Paciente paciente = buscarPacientePorCpf(cpf);
-        if (paciente == null) {
-            return false;
-        }
         paciente.complementar(idade, telefone);
-        return true;
     }
 
-    public boolean complementarPaciente(String cpf, int idade, String telefone, String convenioNome) {
+    public void complementarPaciente(String cpf, int idade, String telefone, String convenioNome)
+            throws PacienteNaoEncontradoException, OperacaoInvalidaException {
+        validarComplementacao(idade, telefone);
         Paciente paciente = buscarPacientePorCpf(cpf);
-        if (paciente == null) {
-            return false;
-        }
         paciente.complementar(idade, telefone, convenioNome);
-        return true;
     }
 
-    public boolean complementarPaciente(String cpf, int idade, String telefone, Convenio convenio) {
+    public void complementarPaciente(String cpf, int idade, String telefone, Convenio convenio)
+            throws PacienteNaoEncontradoException, OperacaoInvalidaException {
+        validarComplementacao(idade, telefone);
         Paciente paciente = buscarPacientePorCpf(cpf);
-        if (paciente == null) {
-            return false;
-        }
         paciente.complementar(idade, telefone, convenio);
-        return true;
     }
 
     public boolean pacienteExiste(String cpf) {
@@ -84,5 +75,30 @@ public class ClinicaServico {
             return "";
         }
         return cpf.trim();
+    }
+
+    private void validarPacienteParaCadastro(Paciente paciente) throws OperacaoInvalidaException {
+        if (paciente == null) {
+            throw new OperacaoInvalidaException("Paciente invalido.");
+        }
+        if (paciente.getNome().trim().equals("")) {
+            throw new OperacaoInvalidaException("Nome obrigatorio.");
+        }
+        String cpf = normalizarCpf(paciente.getCpf());
+        if (cpf.equals("")) {
+            throw new OperacaoInvalidaException("CPF obrigatorio.");
+        }
+        if (cpfsCadastrados.contains(cpf)) {
+            throw new OperacaoInvalidaException("CPF ja cadastrado.");
+        }
+    }
+
+    private void validarComplementacao(int idade, String telefone) throws OperacaoInvalidaException {
+        if (idade < 0) {
+            throw new OperacaoInvalidaException("Idade invalida.");
+        }
+        if (telefone == null || telefone.trim().equals("")) {
+            throw new OperacaoInvalidaException("Telefone obrigatorio para complementar cadastro.");
+        }
     }
 }

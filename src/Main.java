@@ -79,104 +79,98 @@ public class Main {
     }
 
     public static void cadastrarPaciente() {
-        System.out.print("Nome: ");
-        String nome = sc.nextLine();
-        System.out.print("CPF: ");
-        String cpf = sc.nextLine();
+        try {
+            System.out.print("Nome: ");
+            String nome = sc.nextLine();
+            System.out.print("CPF: ");
+            String cpf = sc.nextLine();
 
-        if (servico.pacienteExiste(cpf)) {
-            System.out.println("CPF ja cadastrado!");
-            return;
-        }
-
-        System.out.print("Tipo (1-Minimo / 2-Com idade e tel / 3-Completo): ");
-        int tipo = Integer.parseInt(sc.nextLine());
-
-        Paciente paciente;
-
-        if (tipo == 1) {
-            paciente = new Paciente(nome, cpf);
-        } else if (tipo == 2) {
-            Integer idade = lerInteiro("Idade: ");
-            if (idade == null) {
+            Integer tipo = lerInteiro("Tipo (1-Minimo / 2-Com idade e tel / 3-Completo): ");
+            if (tipo == null) {
                 return;
             }
-            System.out.print("Telefone: ");
-            String tel = sc.nextLine();
-            paciente = new Paciente(nome, cpf, idade.intValue(), tel);
-        } else if (tipo == 3) {
-            Integer idade = lerInteiro("Idade: ");
-            if (idade == null) {
+
+            Paciente paciente;
+
+            if (tipo.intValue() == 1) {
+                paciente = new Paciente(nome, cpf);
+            } else if (tipo.intValue() == 2) {
+                Integer idade = lerInteiro("Idade: ");
+                if (idade == null) {
+                    return;
+                }
+                System.out.print("Telefone: ");
+                String tel = sc.nextLine();
+                paciente = new Paciente(nome, cpf, idade.intValue(), tel);
+            } else if (tipo.intValue() == 3) {
+                Integer idade = lerInteiro("Idade: ");
+                if (idade == null) {
+                    return;
+                }
+                System.out.print("Telefone: ");
+                String tel = sc.nextLine();
+                System.out.print("Convenio: ");
+                String conv = sc.nextLine();
+                Convenio convenio = criarConvenio(conv);
+                paciente = new Paciente(nome, cpf, idade.intValue(), tel, convenio);
+            } else {
+                System.out.println("Tipo de cadastro invalido.");
                 return;
             }
-            System.out.print("Telefone: ");
-            String tel = sc.nextLine();
-            System.out.print("Convenio: ");
-            String conv = sc.nextLine();
-            Convenio convenio = criarConvenio(conv);
-            paciente = new Paciente(nome, cpf, idade.intValue(), tel, convenio);
-        } else {
-            System.out.println("Tipo de cadastro invalido.");
-            return;
-        }
-        if (servico.cadastrarPaciente(paciente)) {
+
+            servico.cadastrarPaciente(paciente);
             sincronizarPacientes();
             System.out.println("Paciente cadastrado com sucesso!");
-        } else {
-            System.out.println("Nao foi possivel cadastrar paciente.");
+        } catch (OperacaoInvalidaException e) {
+            System.out.println(e.getMessage());
         }
     }
 
     public static void complementarPaciente() {
-        System.out.print("CPF: ");
-        String cpf = sc.nextLine();
-        Paciente paciente = servico.buscarPacientePorCpf(cpf);
-        if (paciente == null) {
-            System.out.println("Paciente nao encontrado.");
-            return;
-        }
+        try {
+            System.out.print("CPF: ");
+            String cpf = sc.nextLine();
+            servico.buscarPacientePorCpf(cpf);
 
-        Integer tipo = lerInteiro("Vai informar convenio? (1-Nao / 2-Sim): ");
-        if (tipo == null) {
-            return;
-        }
+            Integer tipo = lerInteiro("Vai informar convenio? (1-Nao / 2-Sim): ");
+            if (tipo == null) {
+                return;
+            }
 
-        Integer idade = lerInteiro("Idade: ");
-        if (idade == null) {
-            return;
-        }
-        System.out.print("Telefone: ");
-        String tel = sc.nextLine();
+            Integer idade = lerInteiro("Idade: ");
+            if (idade == null) {
+                return;
+            }
+            System.out.print("Telefone: ");
+            String tel = sc.nextLine();
 
-        boolean atualizado;
-        if (tipo.intValue() == 1) {
-            atualizado = servico.complementarPaciente(cpf, idade.intValue(), tel);
-        } else if (tipo.intValue() == 2) {
-            System.out.print("Convenio: ");
-            String conv = sc.nextLine();
-            Convenio convenio = criarConvenio(conv);
-            atualizado = servico.complementarPaciente(cpf, idade.intValue(), tel, convenio);
-        } else {
-            System.out.println("Tipo de complementacao invalido.");
-            return;
-        }
+            if (tipo.intValue() == 1) {
+                servico.complementarPaciente(cpf, idade.intValue(), tel);
+            } else if (tipo.intValue() == 2) {
+                System.out.print("Convenio: ");
+                String conv = sc.nextLine();
+                Convenio convenio = criarConvenio(conv);
+                servico.complementarPaciente(cpf, idade.intValue(), tel, convenio);
+            } else {
+                System.out.println("Tipo de complementacao invalido.");
+                return;
+            }
 
-        if (atualizado) {
             sincronizarPacientes();
             System.out.println("Cadastro atualizado!");
-        } else {
-            System.out.println("Nao foi possivel atualizar cadastro.");
+        } catch (PacienteNaoEncontradoException | OperacaoInvalidaException e) {
+            System.out.println(e.getMessage());
         }
     }
 
     public static void buscarPaciente() {
         System.out.print("CPF: ");
         String cpf = sc.nextLine();
-        Paciente paciente = servico.buscarPacientePorCpf(cpf);
-        if (paciente == null) {
-            System.out.println("Paciente nao encontrado.");
-        } else {
+        try {
+            Paciente paciente = servico.buscarPacientePorCpf(cpf);
             System.out.println(paciente.exibirResumo());
+        } catch (PacienteNaoEncontradoException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -194,13 +188,12 @@ public class Main {
     public static void desativarPaciente() {
         System.out.print("CPF: ");
         String cpf = sc.nextLine();
-        Paciente paciente = servico.buscarPacientePorCpf(cpf);
-        if (paciente == null) {
-            System.out.println("Paciente nao encontrado.");
-        } else {
+        try {
             servico.desativarPaciente(cpf);
             sincronizarPacientes();
             System.out.println("Paciente desativado.");
+        } catch (PacienteNaoEncontradoException | PacienteInativoException e) {
+            System.out.println(e.getMessage());
         }
     }
 
