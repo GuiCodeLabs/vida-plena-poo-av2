@@ -1,18 +1,18 @@
 public abstract class Pessoa {
-    private String nome;
-    private String cpf;
-    private String telefone;
-    private String dataNascimento;
+    private String nome = "";
+    private String cpf = "";
+    private String telefone = "";
+    private String dataNascimento = "";
 
     public Pessoa(String nome, String cpf) {
         this(nome, cpf, "", "");
     }
 
     public Pessoa(String nome, String cpf, String telefone, String dataNascimento) {
-        this.nome = nome;
-        this.cpf = cpf;
-        this.telefone = telefone;
-        this.dataNascimento = dataNascimento;
+        setNome(nome);
+        setCpf(cpf);
+        setTelefone(telefone);
+        setDataNascimento(dataNascimento);
     }
 
     public String getNome() {
@@ -20,7 +20,9 @@ public abstract class Pessoa {
     }
 
     public void setNome(String nome) {
-        this.nome = nome;
+        if (nome != null && !nome.trim().equals("")) {
+            this.nome = nome.trim();
+        }
     }
 
     public String getCpf() {
@@ -28,7 +30,9 @@ public abstract class Pessoa {
     }
 
     public void setCpf(String cpf) {
-        this.cpf = cpf;
+        if (cpf != null && !cpf.trim().equals("")) {
+            this.cpf = cpf.trim();
+        }
     }
 
     public String getTelefone() {
@@ -36,7 +40,11 @@ public abstract class Pessoa {
     }
 
     public void setTelefone(String telefone) {
-        this.telefone = telefone;
+        if (telefone == null) {
+            this.telefone = "";
+        } else {
+            this.telefone = telefone.trim();
+        }
     }
 
     public String getDataNascimento() {
@@ -44,7 +52,11 @@ public abstract class Pessoa {
     }
 
     public void setDataNascimento(String dataNascimento) {
-        this.dataNascimento = dataNascimento;
+        if (dataNascimento == null) {
+            this.dataNascimento = "";
+        } else {
+            this.dataNascimento = dataNascimento.trim();
+        }
     }
 
     public abstract String exibirResumo();

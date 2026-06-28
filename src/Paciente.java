@@ -44,7 +44,9 @@ public class Paciente extends Pessoa {
     }
 
     public void setIdade(int idade) {
-        this.idade = idade;
+        if (idade >= 0) {
+            this.idade = idade;
+        }
     }
 
     public String getConvenioNome() {
@@ -52,7 +54,11 @@ public class Paciente extends Pessoa {
     }
 
     public void setConvenioNome(String convenioNome) {
-        this.convenioNome = convenioNome;
+        if (convenioNome == null) {
+            this.convenioNome = "";
+        } else {
+            this.convenioNome = convenioNome.trim();
+        }
     }
 
     public boolean isAtivo() {
