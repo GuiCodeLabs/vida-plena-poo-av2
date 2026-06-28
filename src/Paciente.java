@@ -5,38 +5,38 @@ public class Paciente extends Pessoa {
 
     public Paciente(String nome, String cpf) {
         super(nome, cpf);
-        this.idade = 0;
-        this.convenioNome = "";
-        this.ativo = true;
+        setIdade(0);
+        setConvenioNome("");
+        setAtivo(true);
     }
 
     public Paciente(String nome, String cpf, int idade, String telefone) {
         super(nome, cpf, telefone, "");
-        this.idade = idade;
-        this.convenioNome = "";
-        this.ativo = true;
+        setIdade(idade);
+        setConvenioNome("");
+        setAtivo(true);
     }
 
     public Paciente(String nome, String cpf, int idade, String telefone, String convenioNome) {
         super(nome, cpf, telefone, "");
-        this.idade = idade;
-        this.convenioNome = convenioNome;
-        this.ativo = true;
+        setIdade(idade);
+        setConvenioNome(convenioNome);
+        setAtivo(true);
     }
 
     public void complementar(int idade, String telefone) {
-        this.idade = idade;
+        setIdade(idade);
         setTelefone(telefone);
     }
 
     public void complementar(int idade, String telefone, String convenioNome) {
-        this.idade = idade;
+        setIdade(idade);
         setTelefone(telefone);
-        this.convenioNome = convenioNome;
+        setConvenioNome(convenioNome);
     }
 
     public void desativar() {
-        this.ativo = false;
+        setAtivo(false);
     }
 
     public int getIdade() {
