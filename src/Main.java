@@ -335,58 +335,60 @@ public class Main {
         }
     }
 
-    public static void agendarComProfissional() {
+public static void agendarComProfissional() {
+    try {
         System.out.print("CPF do paciente: ");
         String cpf = sc.nextLine();
+
         int idxPac = buscarIndicePaciente(cpf);
         if (idxPac == -1) {
-            System.out.println("Paciente nao encontrado.");
-            return;
+            throw new ConsultaNaoEncontradaException("Paciente não encontrado para agendamento.");
         }
+
         if (!pacientes[idxPac].ativo) {
-            System.out.println("Paciente inativo. Nao e possivel agendar.");
-            return;
+            throw new OperacaoInvalidaException("Paciente inativo. Não é possível agendar consulta.");
         }
 
         System.out.print("Nome do profissional: ");
         String nomeProf = sc.nextLine();
+
         int idxProf = buscarIndiceProfissional(nomeProf);
         if (idxProf == -1) {
-            System.out.println("Profissional nao encontrado.");
-            return;
+            throw new ConsultaNaoEncontradaException("Profissional não encontrado.");
         }
+
         if (profissionais[idxProf].valorConsulta == 0) {
-            System.out.println("Profissional sem valor definido. Nao pode agendar.");
-            return;
+            throw new OperacaoInvalidaException("Profissional sem valor definido. Não pode agendar.");
         }
 
         System.out.print("Data (DD/MM/AAAA): ");
         String data = sc.nextLine();
+
         System.out.print("Horario (HH:MM): ");
         String horario = sc.nextLine();
 
-        // verifica dia da semana
         String diaSemana = descobrirDiaSemana(data);
+
         if (!profissionais[idxProf].atendeNoDia(diaSemana)) {
-            System.out.println("Profissional nao atende nesse dia.");
-            return;
+            throw new HorarioIndisponivelException("Profissional não atende nesse dia.");
         }
 
-        // verifica conflito
         if (temConflito(nomeProf, data, horario)) {
-            System.out.println("Horario ocupado!");
+            System.out.println("Horário ocupado!");
+
             String sugestao = sugerirHorario(nomeProf, data);
             if (sugestao.equals("")) {
-                System.out.println("Nenhum horario disponivel nesse dia.");
-                return;
+                throw new HorarioIndisponivelException("Nenhum horário disponível nesse dia.");
             }
-            System.out.println("Sugestao: " + sugestao);
+
+            System.out.println("Sugestão: " + sugestao);
             System.out.print("Aceita? (1-Sim / 2-Nao): ");
             int aceita = Integer.parseInt(sc.nextLine());
+
             if (aceita == 1) {
                 horario = sugestao;
             } else {
-                return;
+                throw new HorarioIndisponivelException("Agendamento cancelado por conflito de horário.");
             }
         }
 
@@ -396,35 +398,49 @@ public class Main {
         if (infoTipo == 1) {
             consultas.add(new Consulta(cpf, nomeProf, data, horario));
         } else {
-        System.out.print("Tipo (inicial/retorno/avaliacao): ");
-        String tipo = sc.nextLine();
-        consultas.add(new Consulta(cpf, nomeProf, data, horario, tipo));
-    }
+            System.out.print("Tipo (inicial/retorno/avaliacao): ");
+            String tipo = sc.nextLine();
+            consultas.add(new Consulta(cpf, nomeProf, data, horario, tipo));
+        }
 
-    public static void agendarPorEspecialidade() {
+        System.out.println("Consulta agendada com sucesso!");
+
+    } catch (ConsultaNaoEncontradaException | HorarioIndisponivelException | OperacaoInvalidaException e) {
+        System.out.println(e.getMessage());
+    } catch (NumberFormatException e) {
+        System.out.println("Entrada numérica inválida.");
+    } finally {
+        System.out.println("Operação de agendamento finalizada.");
+    }
+}
+
+public static void agendarPorEspecialidade() {
+    try {
         System.out.print("CPF do paciente: ");
         String cpf = sc.nextLine();
+
         int idxPac = buscarIndicePaciente(cpf);
         if (idxPac == -1) {
-            System.out.println("Paciente nao encontrado.");
-            return;
+            throw new ConsultaNaoEncontradaException("Paciente não encontrado para agendamento.");
         }
+
         if (!pacientes[idxPac].ativo) {
-            System.out.println("Paciente inativo. Nao e possivel agendar.");
-            return;
+            throw new OperacaoInvalidaException("Paciente inativo. Não é possível agendar consulta.");
         }
 
         System.out.print("Especialidade: ");
         String esp = sc.nextLine();
+
         System.out.print("Data (DD/MM/AAAA): ");
         String data = sc.nextLine();
+
         System.out.print("Horario (HH:MM): ");
         String horario = sc.nextLine();
 
         String diaSemana = descobrirDiaSemana(data);
 
-        // procura profissional disponivel
         int idxProf = -1;
+
         for (int i = 0; i < totalProfissionais; i++) {
             if (profissionais[i].especialidade.equals(esp)
                     && profissionais[i].valorConsulta > 0
@@ -436,46 +452,58 @@ public class Main {
         }
 
         if (idxProf == -1) {
-            System.out.println("Nenhum profissional disponivel.");
-            return;
+            throw new HorarioIndisponivelException("Nenhum profissional disponível para essa especialidade.");
         }
 
         consultas.add(new Consulta(cpf, profissionais[idxProf].nome, data, horario));
-        System.out.println("Consulta agendada com " + profissionais[idxProf].nome + "!");
-    }
 
-    public static void cancelarConsulta() {
+        System.out.println("Consulta agendada com " + profissionais[idxProf].nome + "!");
+
+    } catch (ConsultaNaoEncontradaException | HorarioIndisponivelException | OperacaoInvalidaException e) {
+        System.out.println(e.getMessage());
+    } finally {
+        System.out.println("Operação de agendamento por especialidade finalizada.");
+    }
+}
+
+public static void cancelarConsulta() {
+    try {
         System.out.print("CPF: ");
         String cpf = sc.nextLine();
+
         System.out.print("Data (DD/MM/AAAA): ");
         String data = sc.nextLine();
+
         System.out.print("Horario (HH:MM): ");
         String horario = sc.nextLine();
 
-        // localiza a consulta
         int idx = -1;
+
         for (int i = 0; i < consultas.size(); i++) {
-            if (consultas.get(i).cpfPaciente.equals(cpf) && consultas.get(i).data.equals(data)
-                    && consultas.get(i).horario.equals(horario)) {
+            Consulta consulta = consultas.get(i);
+
+            if (consulta.cpfPaciente.equals(cpf)
+                    && consulta.data.equals(data)
+                    && consulta.horario.equals(horario)) {
                 idx = i;
                 break;
             }
         }
 
         if (idx == -1) {
-            System.out.println("Consulta nao encontrada.");
-            return;
-        }
-        if (consultas.get(idx).status.equals("realizada")) {
-            System.out.println("Consulta ja realizada. Nao pode cancelar.");
-            return;
-        }
-        if (consultas.get(idx).status.equals("cancelada")) {
-            System.out.println("Consulta ja cancelada.");
-            return;
+            throw new ConsultaNaoEncontradaException("Consulta não encontrada.");
         }
 
-        // calculo da multa
+        Consulta consulta = consultas.get(idx);
+
+        if (consulta.status.equals("realizada")) {
+            throw new OperacaoInvalidaException("Consulta já realizada. Não pode cancelar.");
+        }
+
+        if (consulta.status.equals("cancelada")) {
+            throw new OperacaoInvalidaException("Consulta já está cancelada.");
+        }
+
         System.out.print("Horario atual (HH:MM): ");
         String horaAtual = sc.nextLine();
 
@@ -493,82 +521,116 @@ public class Main {
         int temMotivo = Integer.parseInt(sc.nextLine());
 
         if (temMotivo == 1) {
-            consultas.get(idx).cancelar();
+            consulta.cancelar();
         } else {
             System.out.print("Motivo: ");
             String motivo = sc.nextLine();
-            String msg = consultas.get(idx).cancelar(motivo);
-            System.out.println(msg);
+            System.out.println(consulta.cancelar(motivo));
         }
+
         System.out.println("Consulta cancelada.");
+
+    } catch (ConsultaNaoEncontradaException | OperacaoInvalidaException e) {
+        System.out.println(e.getMessage());
+    } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+        System.out.println("Horário inválido. Use o formato HH:MM.");
+    } finally {
+        System.out.println("Operação de cancelamento finalizada.");
     }
+}
 
 public static void remarcarConsulta() {
-    System.out.print("CPF: ");
-    String cpf = sc.nextLine();
-    System.out.print("Data original (DD/MM/AAAA): ");
-    String dataOrig = sc.nextLine();
-    System.out.print("Horario original (HH:MM): ");
-    String horarioOrig = sc.nextLine();
+    try {
+        System.out.print("CPF: ");
+        String cpf = sc.nextLine();
 
-    int idx = -1;
-    for (int i = 0; i < consultas.size(); i++) {
-        if (consultas.get(i).cpfPaciente.equals(cpf) && consultas.get(i).data.equals(dataOrig)
-                && consultas.get(i).horario.equals(horarioOrig)
-                && consultas.get(i).status.equals("agendada")) {
-            idx = i;
-            break;
+        System.out.print("Data original (DD/MM/AAAA): ");
+        String dataOrig = sc.nextLine();
+
+        System.out.print("Horario original (HH:MM): ");
+        String horarioOrig = sc.nextLine();
+
+        int idx = -1;
+
+        for (int i = 0; i < consultas.size(); i++) {
+            Consulta consulta = consultas.get(i);
+
+            if (consulta.cpfPaciente.equals(cpf)
+                    && consulta.data.equals(dataOrig)
+                    && consulta.horario.equals(horarioOrig)
+                    && consulta.status.equals("agendada")) {
+                idx = i;
+                break;
+            }
         }
-    }
 
-    if (idx == -1) {
-        System.out.println("Consulta agendada nao encontrada.");
-        return;
-    }
-
-    System.out.print("Apenas trocar horario no mesmo dia? (1-Sim / 2-Nao): ");
-    int tipo = Integer.parseInt(sc.nextLine());
-
-    String novaData;
-    String novoHorario;
-
-    if (tipo == 1) {
-        novaData = dataOrig;
-        System.out.print("Novo horario: ");
-        novoHorario = sc.nextLine();
-    } else {
-        System.out.print("Nova data (DD/MM/AAAA): ");
-        novaData = sc.nextLine();
-        System.out.print("Novo horario (HH:MM): ");
-        novoHorario = sc.nextLine();
-    }
-
-    String nomeProf = consultas.get(idx).nomeProfissional;
-    int idxProf = buscarIndiceProfissional(nomeProf);
-
-    if (tipo == 2) {
-        String dia = descobrirDiaSemana(novaData);
-        if (!profissionais[idxProf].atendeNoDia(dia)) {
-            System.out.println("Profissional nao atende nesse dia.");
-            return;
+        if (idx == -1) {
+            throw new ConsultaNaoEncontradaException("Consulta agendada não encontrada.");
         }
+
+        System.out.print("Apenas trocar horario no mesmo dia? (1-Sim / 2-Nao): ");
+        int tipo = Integer.parseInt(sc.nextLine());
+
+        String novaData;
+        String novoHorario;
+
+        if (tipo == 1) {
+            novaData = dataOrig;
+            System.out.print("Novo horario: ");
+            novoHorario = sc.nextLine();
+        } else {
+            System.out.print("Nova data (DD/MM/AAAA): ");
+            novaData = sc.nextLine();
+
+            System.out.print("Novo horario (HH:MM): ");
+            novoHorario = sc.nextLine();
+        }
+
+        Consulta consultaOriginal = consultas.get(idx);
+
+        if (!consultaOriginal.status.equals("agendada")) {
+            throw new OperacaoInvalidaException(
+        "Somente consultas agendadas podem ser remarcadas."
+            );
+        }
+
+String nomeProf = consultaOriginal.nomeProfissional;
+int idxProf = buscarIndiceProfissional(nomeProf);
+
+        if (idxProf == -1) {
+            throw new ConsultaNaoEncontradaException("Profissional da consulta não encontrado.");
+        }
+
+        if (tipo == 2) {
+            String dia = descobrirDiaSemana(novaData);
+
+            if (!profissionais[idxProf].atendeNoDia(dia)) {
+                throw new HorarioIndisponivelException("Profissional não atende nesse dia.");
+            }
+        }
+
+        if (temConflito(nomeProf, novaData, novoHorario)) {
+            throw new HorarioIndisponivelException("Horário ocupado. Não foi possível remarcar.");
+        }
+
+        String tipoConsulta = consultaOriginal.tipo;
+
+        consultaOriginal.remarcar();
+
+        Consulta novaConsulta = new Consulta(cpf, nomeProf, novaData, novoHorario, tipoConsulta);
+        novaConsulta.agendar(novaData, novoHorario);
+
+        consultas.add(novaConsulta);
+
+        System.out.println("Consulta remarcada com sucesso!");
+
+    } catch (ConsultaNaoEncontradaException | HorarioIndisponivelException | OperacaoInvalidaException e) {
+        System.out.println(e.getMessage());
+    } catch (NumberFormatException e) {
+        System.out.println("Entrada numérica inválida.");
+    } finally {
+        System.out.println("Operação de remarcação finalizada.");
     }
-
-    if (temConflito(nomeProf, novaData, novoHorario)) {
-        System.out.println("Horario ocupado. Nao foi possivel remarcar.");
-        return;
-    }
-
-    String tipoConsulta = consultas.get(idx).tipo;
-
-    consultas.get(idx).remarcar();
-
-    Consulta novaConsulta = new Consulta(cpf, nomeProf, novaData, novoHorario, tipoConsulta);
-    novaConsulta.agendar(novaData, novoHorario);
-
-    consultas.add(novaConsulta);
-
-    System.out.println("Consulta remarcada com sucesso!");
 }
 
 public static void listarConsultas() {
@@ -578,7 +640,7 @@ public static void listarConsultas() {
     }
 
     for (int i = 0; i < consultas.size(); i++) {
-        System.out.println("[" + i + "] " + consultas.get(i).exibirResumo());
+        System.out.println("[" + i + "] " + consultas.get(i).exibirResumo());   
     }
 }
 
