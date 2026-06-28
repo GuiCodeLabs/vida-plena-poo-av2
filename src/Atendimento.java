@@ -4,14 +4,15 @@ public class Atendimento {
     public String diagnostico;
     public String[] procedimentos;
     public int totalProcedimentos;
+    private Prontuario prontuario;
 
-    // registro basico - so observacoes
     public Atendimento(int indiceConsulta, String observacoes) {
         this.indiceConsulta = indiceConsulta;
         this.observacoes = observacoes;
         this.diagnostico = "";
         this.procedimentos = new String[10];
         this.totalProcedimentos = 0;
+        this.prontuario = new Prontuario();
     }
 
     public Atendimento(int indiceConsulta, String observacoes, String diagnostico) {
@@ -20,9 +21,9 @@ public class Atendimento {
         this.diagnostico = diagnostico;
         this.procedimentos = new String[10];
         this.totalProcedimentos = 0;
+        this.prontuario = new Prontuario();
     }
 
-    // registro completo com procedimentos ja definidos
     public Atendimento(int indiceConsulta, String observacoes, String diagnostico,
                        String[] procedimentos, int totalProcedimentos) {
         this.indiceConsulta = indiceConsulta;
@@ -30,12 +31,12 @@ public class Atendimento {
         this.diagnostico = diagnostico;
         this.procedimentos = new String[10];
         this.totalProcedimentos = totalProcedimentos;
+        this.prontuario = new Prontuario();
         for (int i = 0; i < totalProcedimentos; i++) {
             this.procedimentos[i] = procedimentos[i];
         }
     }
 
-    // adiciona um por vez
     public void adicionarProcedimento(String procedimento) {
         if (totalProcedimentos < 10) {
             procedimentos[totalProcedimentos] = procedimento;
@@ -43,7 +44,6 @@ public class Atendimento {
         }
     }
 
-    // adiciona varios de uma vez
     public void adicionarProcedimento(String[] procs, int quantidade) {
         for (int i = 0; i < quantidade; i++) {
             if (totalProcedimentos < 10) {
@@ -51,6 +51,10 @@ public class Atendimento {
                 totalProcedimentos++;
             }
         }
+    }
+
+    public Prontuario getProntuario() {
+        return prontuario;
     }
 
     public String exibirResumo() {
