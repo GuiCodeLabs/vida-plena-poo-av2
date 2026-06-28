@@ -199,6 +199,10 @@ public class Atendimento implements Exportavel {
             resumo = resumo + "\nData do registro: " + prontuario.getDataRegistro();
         }
 
+        if (registroEspecifico != null && !registroEspecifico.trim().equals("")) {
+            resumo = resumo + "\nRegistro especifico: " + registroEspecifico.trim();
+        }
+
         ArrayList<String> procedimentosProntuario = new ArrayList<String>();
 
         if (prontuario != null) {
