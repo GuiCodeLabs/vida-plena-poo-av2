@@ -6,6 +6,7 @@ public class Atendimento {
     public int totalProcedimentos;
     private Consulta consulta;
     private Prontuario prontuario;
+    private boolean finalizado;
 
     public Atendimento(int indiceConsulta, String observacoes) {
         this.indiceConsulta = indiceConsulta;
@@ -14,6 +15,7 @@ public class Atendimento {
         this.procedimentos = new String[10];
         this.totalProcedimentos = 0;
         this.prontuario = new Prontuario();
+        this.finalizado = false;
     }
 
     public Atendimento(int indiceConsulta, String observacoes, String diagnostico) {
@@ -23,6 +25,7 @@ public class Atendimento {
         this.procedimentos = new String[10];
         this.totalProcedimentos = 0;
         this.prontuario = new Prontuario();
+        this.finalizado = false;
     }
 
     public Atendimento(int indiceConsulta, String observacoes, String diagnostico,
@@ -33,6 +36,7 @@ public class Atendimento {
         this.procedimentos = new String[10];
         this.totalProcedimentos = totalProcedimentos;
         this.prontuario = new Prontuario();
+        this.finalizado = false;
         for (int i = 0; i < totalProcedimentos; i++) {
             this.procedimentos[i] = procedimentos[i];
         }
@@ -85,6 +89,18 @@ public class Atendimento {
         prontuario.setDiagnostico(diagnostico);
         this.observacoes = prontuario.getObservacoes();
         this.diagnostico = prontuario.getDiagnostico();
+    }
+
+    public void finalizarAtendimento() {
+        finalizado = true;
+
+        if (consulta != null) {
+            consulta.realizar();
+        }
+    }
+
+    public boolean isFinalizado() {
+        return finalizado;
     }
 
     public String gerarResumoClinico() {
