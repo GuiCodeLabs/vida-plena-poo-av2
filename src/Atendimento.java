@@ -1,4 +1,4 @@
-public class Atendimento {
+public class Atendimento implements Exportavel {
     public int indiceConsulta;
     public String observacoes;
     public String diagnostico;
@@ -101,6 +101,19 @@ public class Atendimento {
 
     public boolean isFinalizado() {
         return finalizado;
+    }
+
+    @Override
+    public String exportarDados() {
+        String dados = gerarResumoClinico();
+
+        if (finalizado) {
+            dados = dados + "\nAtendimento finalizado: sim";
+        } else {
+            dados = dados + "\nAtendimento finalizado: nao";
+        }
+
+        return dados;
     }
 
     public String gerarResumoClinico() {
