@@ -420,6 +420,10 @@ public static void agendarComProfissional() {
         servico.agendarConsultaPorProfissional(consultas, profissionais, totalProfissionais,
                 cpf, nome, data, horario, tipo, diaSemana);
         System.out.println("Consulta agendada com sucesso!");
+    } catch (Exception e) {
+        System.out.println(e.getMessage());
+    } finally {
+        System.out.println("Operação de agendamento finalizada.");
     }
 }
 
@@ -435,11 +439,23 @@ public static void agendarPorEspecialidade() {
     String horario = sc.nextLine();
     String diaSemana = descobrirDiaSemana(data);
 
-    try {
-        servico.agendarConsultaPorEspecialidade(consultas, profissionais, totalProfissionais,
-                cpf, especialidade, data, horario, diaSemana);
+        try {
+        servico.agendarConsultaPorEspecialidade(
+                consultas,
+                profissionais,
+                totalProfissionais,
+                cpf,
+                especialidade,
+                data,
+                horario,
+                diaSemana
+        );
+
         System.out.println("Consulta agendada por especialidade com sucesso!");
+
+    } catch (Exception e) {
         System.out.println(e.getMessage());
+
     } finally {
         System.out.println("Operação de agendamento por especialidade finalizada.");
     }
@@ -686,7 +702,7 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
         }
     }
 
-   public static void pagamentoDireto() {
+    public static void pagamentoDireto() {
         System.out.print("Indice da consulta: ");
         int idxConsulta = Integer.parseInt(sc.nextLine());
 
@@ -720,7 +736,7 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
             String nomeConvenio = sc.nextLine();
             Convenio convenio = buscarConvenioPorNome(nomeConvenio);
 
-            String nomeProfConsulta = consultas[idxConsulta].nomeProfissional;
+            String nomeProfConsulta = consultas.get(idxConsulta).nomeProfissional;
             int idxProfConsulta = buscarIndiceProfissional(nomeProfConsulta);
             String especialidade = profissionais[idxProfConsulta].especialidade;
 
@@ -804,7 +820,13 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
                 System.out.println("Erro no pagamento: " + e.getMessage());
             }
         } else if (tipoPag.equals("convenio")) {
-            Convenio convenio = buscarConvenioPorNome(pacientes[idxPac].convenioNome);
+            Convenio convenio = null;
+        try {
+            convenio = servico.buscarPacientePorCpf(cpfPac).getConvenio();
+        }   catch (PacienteNaoEncontradoException e) {
+                System.out.println(e.getMessage());
+            return;
+        }
             String especialidade = profissionais[idxProf].especialidade;
 
             try {

@@ -1,6 +1,6 @@
 public class PagamentoDinheiro extends Pagamento {
     public PagamentoDinheiro() {
-        super(0, 0.0, "dinheiro");
+        super(0, 0.0, "dinheiro", 1);
     }
 
     // SOBRECARGA 1/2: construtor com 3 parametros.
