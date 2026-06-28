@@ -1,3 +1,6 @@
+// A classe Consulta implementa a interface Agendavel,
+// garantindo que todas as consultas possuam operações
+// básicas de agendamento, cancelamento e remarcação.
 public class Consulta implements Agendavel {
 
     public String cpfPaciente;
@@ -7,10 +10,12 @@ public class Consulta implements Agendavel {
     public String tipo;
     public String status;
 
+    // SOBRECARGA: mesmo nome (Consulta), parâmetros diferentes.
     public Consulta(String cpfPaciente, String nomeProfissional, String data, String horario) {
         this(cpfPaciente, nomeProfissional, data, horario, "inicial");
     }
 
+    // SOBRECARGA: construtor com parâmetro extra para informar o tipo da consulta.
     public Consulta(String cpfPaciente, String nomeProfissional, String data, String horario, String tipo) {
         this.cpfPaciente = cpfPaciente;
         this.nomeProfissional = nomeProfissional;
@@ -20,6 +25,7 @@ public class Consulta implements Agendavel {
         this.status = "agendada";
     }
 
+    // SOBRECARGA: construtor com parâmetro extra para informar também o status.
     public Consulta(String cpfPaciente, String nomeProfissional, String data, String horario, String tipo, String status) {
         this.cpfPaciente = cpfPaciente;
         this.nomeProfissional = nomeProfissional;
@@ -29,18 +35,21 @@ public class Consulta implements Agendavel {
         this.status = status;
     }
 
+    // SOBRESCRITA: mesmo nome e parâmetros do método da interface Agendavel.
+    // A classe Consulta redefine o comportamento em tempo de execução.
     @Override
     public void agendar() {
         this.status = "agendada";
     }
 
-    // Sobrecarga
+     // SOBRECARGA: mesmo nome do método agendar, mas com parâmetros diferentes.
     public void agendar(String data, String horario) {
         this.data = data;
         this.horario = horario;
         this.status = "agendada";
     }
 
+    // SOBRESCRITA: implementação do método cancelar() definido em Agendavel.
     @Override
     public void cancelar() {
         if (status.equals("realizada")) {
@@ -56,12 +65,13 @@ public class Consulta implements Agendavel {
         status = "cancelada";
     }
 
-    // Sobrecarga
+    // SOBRECARGA: mesmo nome do método cancelar, mas recebe o motivo.
     public String cancelar(String motivo) {
         cancelar();
         return "Consulta cancelada. Motivo: " + motivo;
     }
 
+    // SOBRESCRITA: implementação do método remarcar() definido em Agendavel.
     @Override
     public void remarcar() {
         if (!status.equals("agendada")) {
@@ -72,7 +82,7 @@ public class Consulta implements Agendavel {
         status = "remarcada";
     }
 
-    // Sobrecarga
+    // SOBRECARGA: mesmo nome do método remarcar, mas recebe nova data e novo horário.
     public void remarcar(String novaData, String novoHorario) {
 
         if (!status.equals("agendada")) {
