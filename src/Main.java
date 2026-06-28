@@ -414,30 +414,33 @@ public static void agendarComProfissional() {
     }
 }
 
-    public static void agendarPorEspecialidade() {
+public static void agendarPorEspecialidade() {
+    try {
         System.out.print("CPF do paciente: ");
         String cpf = sc.nextLine();
+
         int idxPac = buscarIndicePaciente(cpf);
         if (idxPac == -1) {
-            System.out.println("Paciente nao encontrado.");
-            return;
+            throw new ConsultaNaoEncontradaException("Paciente não encontrado para agendamento.");
         }
+
         if (!pacientes[idxPac].ativo) {
-            System.out.println("Paciente inativo. Nao e possivel agendar.");
-            return;
+            throw new OperacaoInvalidaException("Paciente inativo. Não é possível agendar consulta.");
         }
 
         System.out.print("Especialidade: ");
         String esp = sc.nextLine();
+
         System.out.print("Data (DD/MM/AAAA): ");
         String data = sc.nextLine();
+
         System.out.print("Horario (HH:MM): ");
         String horario = sc.nextLine();
 
         String diaSemana = descobrirDiaSemana(data);
 
-        // procura profissional disponivel
         int idxProf = -1;
+
         for (int i = 0; i < totalProfissionais; i++) {
             if (profissionais[i].especialidade.equals(esp)
                     && profissionais[i].valorConsulta > 0
@@ -449,13 +452,19 @@ public static void agendarComProfissional() {
         }
 
         if (idxProf == -1) {
-            System.out.println("Nenhum profissional disponivel.");
-            return;
+            throw new HorarioIndisponivelException("Nenhum profissional disponível para essa especialidade.");
         }
 
         consultas.add(new Consulta(cpf, profissionais[idxProf].nome, data, horario));
+
         System.out.println("Consulta agendada com " + profissionais[idxProf].nome + "!");
+
+    } catch (ConsultaNaoEncontradaException | HorarioIndisponivelException | OperacaoInvalidaException e) {
+        System.out.println(e.getMessage());
+    } finally {
+        System.out.println("Operação de agendamento por especialidade finalizada.");
     }
+}
 
     public static void cancelarConsulta() {
         System.out.print("CPF: ");
