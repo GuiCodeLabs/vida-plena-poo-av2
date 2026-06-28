@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Atendimento implements Exportavel {
     public int indiceConsulta;
     public String observacoes;
@@ -16,6 +18,7 @@ public class Atendimento implements Exportavel {
         this.totalProcedimentos = 0;
         this.prontuario = new Prontuario();
         this.finalizado = false;
+        registrarDadosClinicos(observacoes, "");
     }
 
     public Atendimento(int indiceConsulta, String observacoes, String diagnostico) {
@@ -26,6 +29,7 @@ public class Atendimento implements Exportavel {
         this.totalProcedimentos = 0;
         this.prontuario = new Prontuario();
         this.finalizado = false;
+        registrarDadosClinicos(observacoes, diagnostico);
     }
 
     public Atendimento(int indiceConsulta, String observacoes, String diagnostico,
@@ -34,11 +38,21 @@ public class Atendimento implements Exportavel {
         this.observacoes = observacoes;
         this.diagnostico = diagnostico;
         this.procedimentos = new String[10];
-        this.totalProcedimentos = totalProcedimentos;
+        this.totalProcedimentos = 0;
         this.prontuario = new Prontuario();
         this.finalizado = false;
-        for (int i = 0; i < totalProcedimentos; i++) {
-            this.procedimentos[i] = procedimentos[i];
+        registrarDadosClinicos(observacoes, diagnostico);
+
+        if (procedimentos != null) {
+            int limite = totalProcedimentos;
+
+            if (limite > procedimentos.length) {
+                limite = procedimentos.length;
+            }
+
+            for (int i = 0; i < limite; i++) {
+                adicionarProcedimento(procedimentos[i]);
+            }
         }
     }
 
@@ -59,20 +73,45 @@ public class Atendimento implements Exportavel {
     }
 
     public void adicionarProcedimento(String procedimento) {
-        prontuario.adicionarProcedimento(procedimento);
+        if (procedimento == null) {
+            return;
+        }
 
-        if (totalProcedimentos < 10) {
-            procedimentos[totalProcedimentos] = procedimento;
+        String procedimentoTratado = procedimento.trim();
+
+        if (procedimentoTratado.equals("")) {
+            return;
+        }
+
+        prontuario.adicionarProcedimento(procedimentoTratado);
+
+        if (procedimentos == null) {
+            procedimentos = new String[10];
+        }
+
+        if (totalProcedimentos < 0) {
+            totalProcedimentos = 0;
+        }
+
+        if (totalProcedimentos < procedimentos.length) {
+            procedimentos[totalProcedimentos] = procedimentoTratado;
             totalProcedimentos++;
         }
     }
 
     public void adicionarProcedimento(String[] procs, int quantidade) {
-        for (int i = 0; i < quantidade; i++) {
-            if (totalProcedimentos < 10) {
-                procedimentos[totalProcedimentos] = procs[i];
-                totalProcedimentos++;
-            }
+        if (procs == null) {
+            return;
+        }
+
+        int limite = quantidade;
+
+        if (limite > procs.length) {
+            limite = procs.length;
+        }
+
+        for (int i = 0; i < limite; i++) {
+            adicionarProcedimento(procs[i]);
         }
     }
 
@@ -144,23 +183,39 @@ public class Atendimento implements Exportavel {
             resumo = resumo + "\nData do registro: " + prontuario.getDataRegistro();
         }
 
-        if (prontuario != null && !prontuario.getProcedimentosRealizados().isEmpty()) {
+        ArrayList<String> procedimentosProntuario = new ArrayList<String>();
+
+        if (prontuario != null) {
+            procedimentosProntuario = prontuario.getProcedimentosRealizados();
+        }
+
+        if (!procedimentosProntuario.isEmpty()) {
             resumo = resumo + "\nProcedimentos: ";
-            for (int i = 0; i < prontuario.getProcedimentosRealizados().size(); i++) {
-                resumo = resumo + prontuario.getProcedimentosRealizados().get(i);
-                if (i < prontuario.getProcedimentosRealizados().size() - 1) {
+            for (int i = 0; i < procedimentosProntuario.size(); i++) {
+                resumo = resumo + procedimentosProntuario.get(i);
+                if (i < procedimentosProntuario.size() - 1) {
                     resumo = resumo + ", ";
                 }
             }
-        } else if (totalProcedimentos > 0) {
-            resumo = resumo + "\nProcedimentos: ";
-            for (int i = 0; i < totalProcedimentos; i++) {
-                if (procedimentos[i] != null) {
-                    resumo = resumo + procedimentos[i];
-                    if (i < totalProcedimentos - 1) {
-                        resumo = resumo + ", ";
+        } else if (procedimentos != null && totalProcedimentos > 0) {
+            String procedimentosTexto = "";
+            int limite = totalProcedimentos;
+
+            if (limite > procedimentos.length) {
+                limite = procedimentos.length;
+            }
+
+            for (int i = 0; i < limite; i++) {
+                if (procedimentos[i] != null && !procedimentos[i].trim().equals("")) {
+                    if (!procedimentosTexto.equals("")) {
+                        procedimentosTexto = procedimentosTexto + ", ";
                     }
+                    procedimentosTexto = procedimentosTexto + procedimentos[i].trim();
                 }
+            }
+
+            if (!procedimentosTexto.equals("")) {
+                resumo = resumo + "\nProcedimentos: " + procedimentosTexto;
             }
         }
 
@@ -168,19 +223,35 @@ public class Atendimento implements Exportavel {
     }
 
     public String exibirResumo() {
-        String resumo = "Observacoes: " + observacoes;
+        String resumo = "Observacoes: ";
 
-        if (!diagnostico.equals("")) {
-            resumo = resumo + "\nDiagnostico: " + diagnostico;
+        if (observacoes != null) {
+            resumo = resumo + observacoes.trim();
         }
 
-        if (totalProcedimentos > 0) {
-            resumo = resumo + "\nProcedimentos: ";
-            for (int i = 0; i < totalProcedimentos; i++) {
-                resumo = resumo + procedimentos[i];
-                if (i < totalProcedimentos - 1) {
-                    resumo = resumo + ", ";
+        if (diagnostico != null && !diagnostico.trim().equals("")) {
+            resumo = resumo + "\nDiagnostico: " + diagnostico.trim();
+        }
+
+        if (procedimentos != null && totalProcedimentos > 0) {
+            String procedimentosTexto = "";
+            int limite = totalProcedimentos;
+
+            if (limite > procedimentos.length) {
+                limite = procedimentos.length;
+            }
+
+            for (int i = 0; i < limite; i++) {
+                if (procedimentos[i] != null && !procedimentos[i].trim().equals("")) {
+                    if (!procedimentosTexto.equals("")) {
+                        procedimentosTexto = procedimentosTexto + ", ";
+                    }
+                    procedimentosTexto = procedimentosTexto + procedimentos[i].trim();
                 }
+            }
+
+            if (!procedimentosTexto.equals("")) {
+                resumo = resumo + "\nProcedimentos: " + procedimentosTexto;
             }
         }
         return resumo;

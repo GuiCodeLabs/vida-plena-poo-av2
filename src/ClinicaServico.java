@@ -10,7 +10,7 @@ public class ClinicaServico {
     // Localiza um paciente pelo CPF para validar operações envolvendo consultas.
     public static int buscarIndicePaciente(Paciente[] pacientes, int totalPacientes, String cpf) {
         for (int i = 0; i < totalPacientes; i++) {
-            if (pacientes[i].cpf.equals(cpf)) {
+            if (pacientes[i].getCpf().equals(cpf)) {
                 return i;
             }
         }
@@ -84,7 +84,7 @@ public class ClinicaServico {
             throw new ConsultaNaoEncontradaException("Paciente não encontrado para agendamento.");
         }
 
-        if (!pacientes[idxPac].ativo) {
+        if (!pacientes[idxPac].isAtivo()) {
             throw new PacienteInativoException("Paciente inativo. Não é possível agendar consulta.");
         }
 
@@ -134,7 +134,7 @@ public class ClinicaServico {
             throw new ConsultaNaoEncontradaException("Paciente não encontrado para agendamento.");
         }
 
-        if (!pacientes[idxPac].ativo) {
+        if (!pacientes[idxPac].isAtivo()) {
             throw new PacienteInativoException("Paciente inativo. Não é possível agendar consulta.");
         }
 
