@@ -597,6 +597,7 @@ public static void agendarPorEspecialidade() {
                 especialidade,
                 data,
                 horario,
+                tipo,
                 data,
                 turno
         );

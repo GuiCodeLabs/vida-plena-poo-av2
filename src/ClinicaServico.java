@@ -530,6 +530,7 @@ public class ClinicaServico {
             String especialidade,
             String data,
             String horario,
+            String tipo,
             String dataDisponivel,
             String turno
         ) throws ConsultaNaoEncontradaException, PacienteNaoEncontradoException, PacienteInativoException,
@@ -572,7 +573,11 @@ public class ClinicaServico {
             throw new HorarioIndisponivelException("Todos os profissionais dessa especialidade estão ocupados nesse dia e horario.");
         }
 
-        consultas.add(new Consulta(cpf, profissionais[idxProf].getNome(), data, horario));
+        if (tipo == null || tipo.equals("")) {
+            consultas.add(new Consulta(cpf, profissionais[idxProf].getNome(), data, horario));
+        } else {
+            consultas.add(new Consulta(cpf, profissionais[idxProf].getNome(), data, horario, tipo));
+        }
     }
 
     public Consulta buscarConsulta(
