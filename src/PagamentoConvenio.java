@@ -1,12 +1,18 @@
 public class PagamentoConvenio extends Pagamento {
-
     private Convenio convenio;
+
+    public PagamentoConvenio() {
+        super(0, 0.0, "convenio", 1);
+    }
+    public PagamentoConvenio(int indiceConsulta, double valorFinal, String tipoPagamento) {
+        super(indiceConsulta, valorFinal, tipoPagamento, 1);
+    }
 
     // Construtor unico (ainda nao ha sobrecarga aqui porque o pagamento
     // automatico tambem precisa validar cobertura antes de criar o objeto,
     // entao os dois fluxos passam pelo mesmo caminho de validacao).
     public PagamentoConvenio(int indiceConsulta, double valorBase, String tipoPagamento,
-                              Convenio convenio, String especialidadeConsulta)
+                            Convenio convenio, String especialidadeConsulta)
             throws ConvenioNaoCobreException {
         super(indiceConsulta, 0, tipoPagamento, 1);
 

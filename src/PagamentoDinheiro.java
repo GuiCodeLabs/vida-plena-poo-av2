@@ -1,4 +1,8 @@
 public class PagamentoDinheiro extends Pagamento {
+    public PagamentoDinheiro() {
+        super(0, 0.0, "dinheiro", 1);
+    }
+
     // SOBRECARGA 1/2: construtor com 3 parametros.
     // Usado no pagamento DIRETO, quando o usuario digita o valor base na hora
     // e o desconto de 5% ainda precisa ser calculado por este construtor.
