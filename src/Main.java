@@ -400,8 +400,6 @@ public static void agendarComProfissional() {
         servico.agendarConsultaPorProfissional(consultas, profissionais, totalProfissionais,
                 cpf, nome, data, horario, tipo, diaSemana);
         System.out.println("Consulta agendada com sucesso!");
-    } catch (Exception e) {
-        System.out.println(e.getMessage());
     }
 }
 
@@ -421,7 +419,6 @@ public static void agendarPorEspecialidade() {
         servico.agendarConsultaPorEspecialidade(consultas, profissionais, totalProfissionais,
                 cpf, especialidade, data, horario, diaSemana);
         System.out.println("Consulta agendada por especialidade com sucesso!");
-    } catch (Exception e) {
         System.out.println(e.getMessage());
     } finally {
         System.out.println("Operação de agendamento por especialidade finalizada.");

@@ -204,6 +204,7 @@ public class ClinicaServico {
         return digitos;
     }
 
+
     // ----- Métodos de gerenciamento de consultas -----
     public boolean temConflito(ArrayList<Consulta> consultas, String nomeProf, String data, String horario) {
         for (int i = 0; i < consultas.size(); i++) {
