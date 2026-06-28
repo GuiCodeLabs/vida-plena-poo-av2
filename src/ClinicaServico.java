@@ -44,6 +44,24 @@ public class ClinicaServico {
         }
     }
 
+    public boolean complementarPaciente(String cpf, int idade, String telefone) {
+        Paciente paciente = buscarPacientePorCpf(cpf);
+        if (paciente == null) {
+            return false;
+        }
+        paciente.complementar(idade, telefone);
+        return true;
+    }
+
+    public boolean complementarPaciente(String cpf, int idade, String telefone, String convenioNome) {
+        Paciente paciente = buscarPacientePorCpf(cpf);
+        if (paciente == null) {
+            return false;
+        }
+        paciente.complementar(idade, telefone, convenioNome);
+        return true;
+    }
+
     public boolean pacienteExiste(String cpf) {
         return pacientesPorCpf.containsKey(normalizarCpf(cpf));
     }

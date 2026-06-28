@@ -129,28 +129,42 @@ public class Main {
     public static void complementarPaciente() {
         System.out.print("CPF: ");
         String cpf = sc.nextLine();
-        int idx = buscarIndicePaciente(cpf);
-        if (idx == -1) {
+        Paciente paciente = servico.buscarPacientePorCpf(cpf);
+        if (paciente == null) {
             System.out.println("Paciente nao encontrado.");
             return;
         }
 
-        System.out.print("Vai informar convenio? (1-Nao / 2-Sim): ");
-        int tipo = Integer.parseInt(sc.nextLine());
+        Integer tipo = lerInteiro("Vai informar convenio? (1-Nao / 2-Sim): ");
+        if (tipo == null) {
+            return;
+        }
 
-        System.out.print("Idade: ");
-        int idade = Integer.parseInt(sc.nextLine());
+        Integer idade = lerInteiro("Idade: ");
+        if (idade == null) {
+            return;
+        }
         System.out.print("Telefone: ");
         String tel = sc.nextLine();
 
-        if (tipo == 1) {
-            pacientes[idx].complementar(idade, tel);
-        } else {
+        boolean atualizado;
+        if (tipo.intValue() == 1) {
+            atualizado = servico.complementarPaciente(cpf, idade.intValue(), tel);
+        } else if (tipo.intValue() == 2) {
             System.out.print("Convenio: ");
             String conv = sc.nextLine();
-            pacientes[idx].complementar(idade, tel, conv);
+            atualizado = servico.complementarPaciente(cpf, idade.intValue(), tel, conv);
+        } else {
+            System.out.println("Tipo de complementacao invalido.");
+            return;
         }
-        System.out.println("Cadastro atualizado!");
+
+        if (atualizado) {
+            sincronizarPacientes();
+            System.out.println("Cadastro atualizado!");
+        } else {
+            System.out.println("Nao foi possivel atualizar cadastro.");
+        }
     }
 
     public static void buscarPaciente() {
