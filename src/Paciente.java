@@ -1,6 +1,6 @@
 public class Paciente extends Pessoa {
     private int idade;
-    private String convenioNome;
+    private Convenio convenio;
     private boolean ativo;
 
     public Paciente(String nome, String cpf) {
@@ -24,6 +24,13 @@ public class Paciente extends Pessoa {
         setAtivo(true);
     }
 
+    public Paciente(String nome, String cpf, int idade, String telefone, Convenio convenio) {
+        super(nome, cpf, telefone, "");
+        setIdade(idade);
+        setConvenio(convenio);
+        setAtivo(true);
+    }
+
     public void complementar(int idade, String telefone) {
         setIdade(idade);
         setTelefone(telefone);
@@ -33,6 +40,12 @@ public class Paciente extends Pessoa {
         setIdade(idade);
         setTelefone(telefone);
         setConvenioNome(convenioNome);
+    }
+
+    public void complementar(int idade, String telefone, Convenio convenio) {
+        setIdade(idade);
+        setTelefone(telefone);
+        setConvenio(convenio);
     }
 
     public void desativar() {
@@ -50,15 +63,30 @@ public class Paciente extends Pessoa {
     }
 
     public String getConvenioNome() {
-        return convenioNome;
+        if (convenio == null) {
+            return "";
+        }
+        return convenio.getNome();
     }
 
     public void setConvenioNome(String convenioNome) {
-        if (convenioNome == null) {
-            this.convenioNome = "";
+        if (convenioNome == null || convenioNome.trim().equals("")) {
+            setConvenio(null);
         } else {
-            this.convenioNome = convenioNome.trim();
+            setConvenio(new Convenio(convenioNome, 0));
         }
+    }
+
+    public Convenio getConvenio() {
+        return convenio;
+    }
+
+    public void setConvenio(Convenio convenio) {
+        this.convenio = convenio;
+    }
+
+    public boolean temConvenio() {
+        return convenio != null;
     }
 
     public boolean isAtivo() {
@@ -75,8 +103,12 @@ public class Paciente extends Pessoa {
         if (!isAtivo()) {
             status = "Nao";
         }
+        String convenioResumo = "Sem convenio";
+        if (temConvenio()) {
+            convenioResumo = getConvenioNome();
+        }
         return "Nome: " + getNome() + " | CPF: " + getCpf() + " | Idade: " + getIdade()
-                + " | Tel: " + getTelefone() + " | Convenio: " + getConvenioNome()
+                + " | Tel: " + getTelefone() + " | Convenio: " + convenioResumo
                 + " | Ativo: " + status;
     }
 }
