@@ -42,11 +42,27 @@ public class Prontuario {
     }
 
     public ArrayList<String> getProcedimentosRealizados() {
-        return procedimentosRealizados;
+        return new ArrayList<String>(procedimentosRealizados);
     }
 
     public void setProcedimentosRealizados(ArrayList<String> procedimentosRealizados) {
-        this.procedimentosRealizados = procedimentosRealizados;
+        this.procedimentosRealizados = new ArrayList<String>();
+
+        if (procedimentosRealizados != null) {
+            for (String procedimento : procedimentosRealizados) {
+                adicionarProcedimento(procedimento);
+            }
+        }
+    }
+
+    public void adicionarProcedimento(String procedimento) {
+        if (procedimento != null) {
+            String procedimentoTratado = procedimento.trim();
+
+            if (!procedimentoTratado.isEmpty()) {
+                this.procedimentosRealizados.add(procedimentoTratado);
+            }
+        }
     }
 
     public String getDataRegistro() {
