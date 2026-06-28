@@ -121,6 +121,8 @@ public class Main {
             System.out.println("Paciente cadastrado com sucesso!");
         } catch (OperacaoInvalidaException e) {
             System.out.println(e.getMessage());
+        } finally {
+            System.out.println("--- Operacao de paciente finalizada ---");
         }
     }
 
@@ -154,8 +156,12 @@ public class Main {
             }
 
             System.out.println("Cadastro atualizado!");
-        } catch (PacienteNaoEncontradoException | OperacaoInvalidaException e) {
+        } catch (PacienteNaoEncontradoException e) {
             System.out.println(e.getMessage());
+        } catch (OperacaoInvalidaException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("--- Operacao de paciente finalizada ---");
         }
     }
 
@@ -167,6 +173,8 @@ public class Main {
             System.out.println(paciente.exibirResumo());
         } catch (PacienteNaoEncontradoException e) {
             System.out.println(e.getMessage());
+        } finally {
+            System.out.println("--- Operacao de paciente finalizada ---");
         }
     }
 
@@ -187,8 +195,12 @@ public class Main {
         try {
             servico.desativarPaciente(cpf);
             System.out.println("Paciente desativado.");
-        } catch (PacienteNaoEncontradoException | PacienteInativoException e) {
+        } catch (PacienteNaoEncontradoException e) {
             System.out.println(e.getMessage());
+        } catch (PacienteInativoException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("--- Operacao de paciente finalizada ---");
         }
     }
 
@@ -370,7 +382,10 @@ public class Main {
         String cpf = sc.nextLine();
         try {
             servico.buscarPacienteAtivo(cpf);
-        } catch (PacienteNaoEncontradoException | PacienteInativoException e) {
+        } catch (PacienteNaoEncontradoException e) {
+            System.out.println(e.getMessage());
+            return;
+        } catch (PacienteInativoException e) {
             System.out.println(e.getMessage());
             return;
         }
@@ -435,7 +450,10 @@ public class Main {
         String cpf = sc.nextLine();
         try {
             servico.buscarPacienteAtivo(cpf);
-        } catch (PacienteNaoEncontradoException | PacienteInativoException e) {
+        } catch (PacienteNaoEncontradoException e) {
+            System.out.println(e.getMessage());
+            return;
+        } catch (PacienteInativoException e) {
             System.out.println(e.getMessage());
             return;
         }

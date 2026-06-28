@@ -3,8 +3,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class ClinicaServico {
+    // ArrayList usado para manter a lista editável de pacientes.
     private ArrayList<Paciente> pacientes;
+    // HashMap usado para buscar paciente diretamente pelo CPF.
     private HashMap<String, Paciente> pacientesPorCpf;
+    // HashSet usado para impedir CPF duplicado com verificação rápida.
     private HashSet<String> cpfsCadastrados;
 
     public ClinicaServico() {
