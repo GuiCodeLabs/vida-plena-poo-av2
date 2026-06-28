@@ -448,7 +448,11 @@ public static void agendarComProfissional() {
 
         System.out.println("Consulta agendada com sucesso!");
 
-    } catch (ConsultaNaoEncontradaException | HorarioIndisponivelException | OperacaoInvalidaException e) {
+    } catch (ConsultaNaoEncontradaException e) {
+        System.out.println(e.getMessage());
+    } catch (HorarioIndisponivelException e) {
+        System.out.println(e.getMessage());
+    } catch (OperacaoInvalidaException e) {
         System.out.println(e.getMessage());
     } catch (NumberFormatException e) {
         System.out.println("Entrada numérica inválida.");
@@ -503,7 +507,7 @@ public static void agendarPorEspecialidade() {
 
         System.out.println("Consulta agendada com " + profissionais[idxProf].nome + "!");
 
-    } catch (ConsultaNaoEncontradaException | HorarioIndisponivelException | OperacaoInvalidaException e) {
+    } catch (HorarioIndisponivelException e) {
         System.out.println(e.getMessage());
     } finally {
         System.out.println("Operação de agendamento por especialidade finalizada.");
@@ -574,9 +578,13 @@ public static void cancelarConsulta() {
 
         System.out.println("Consulta cancelada.");
 
-    } catch (ConsultaNaoEncontradaException | OperacaoInvalidaException e) {
+    } catch (ConsultaNaoEncontradaException e) {
         System.out.println(e.getMessage());
-    } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+    } catch (OperacaoInvalidaException e) {
+        System.out.println(e.getMessage());
+    } catch (NumberFormatException e) {
+        System.out.println("Horário inválido. Use o formato HH:MM.");
+    } catch (StringIndexOutOfBoundsException e) {
         System.out.println("Horário inválido. Use o formato HH:MM.");
     } finally {
         System.out.println("Operação de cancelamento finalizada.");
@@ -668,7 +676,11 @@ int idxProf = buscarIndiceProfissional(nomeProf);
 
         System.out.println("Consulta remarcada com sucesso!");
 
-    } catch (ConsultaNaoEncontradaException | HorarioIndisponivelException | OperacaoInvalidaException e) {
+    } catch (ConsultaNaoEncontradaException e) {
+        System.out.println(e.getMessage());
+    } catch (HorarioIndisponivelException e) {
+        System.out.println(e.getMessage());
+    } catch (OperacaoInvalidaException e) {
         System.out.println(e.getMessage());
     } catch (NumberFormatException e) {
         System.out.println("Entrada numérica inválida.");
