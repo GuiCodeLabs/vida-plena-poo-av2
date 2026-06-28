@@ -3,6 +3,10 @@
  * Deve conter atributos específicos como encaminhamento.
  */
 public class ClinicoGeral extends Profissional {
-    // TODO: Implementar atributos específicos e construtores chamando super()
-    // TODO: Sobrescrever exibirResumo() e registrarEspecifico(Atendimento)
+    public ClinicoGeral() {
+        super("", "clinica geral");
+    }
+    public ClinicoGeral(String nome) {
+        super(nome, "clinica geral");
+    }
 }

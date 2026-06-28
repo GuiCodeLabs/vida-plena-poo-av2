@@ -3,6 +3,10 @@
  * Deve aplicar taxas de 2,5% por parcela extra acima de 3 parcelas (limite 6x).
  */
 public class PagamentoCartao extends Pagamento {
-    // TODO: Implementar atributos específicos (parcelas) e construtores
-    // TODO: Sobrescrever calcularValorFinal()
+    public PagamentoCartao() {
+        super(0, 0.0, "cartao");
+    }
+    public PagamentoCartao(int indiceConsulta, double valorFinal, String tipoPagamento, int parcelas) {
+        super(indiceConsulta, valorFinal, tipoPagamento, parcelas);
+    }
 }
