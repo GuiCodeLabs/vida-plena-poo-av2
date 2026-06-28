@@ -36,6 +36,12 @@ public abstract class Profissional extends Pessoa {
     }
 
     public void setEspecialidade(String especialidade) {
+        if (especialidade == null || especialidade.trim().isEmpty()) {
+            throw new IllegalArgumentException("Especialidade nao pode ser vazia.");
+        }
+        if (!especialidadeValida(especialidade)) {
+            throw new IllegalArgumentException("Especialidade invalida.");
+        }
         this.especialidade = especialidade;
     }
 
@@ -44,6 +50,9 @@ public abstract class Profissional extends Pessoa {
     }
 
     public void setRegistroProfissional(String registroProfissional) {
+        if (registroProfissional == null) {
+            registroProfissional = "";
+        }
         this.registroProfissional = registroProfissional;
     }
 
@@ -52,6 +61,9 @@ public abstract class Profissional extends Pessoa {
     }
 
     public void setValorConsulta(double valorConsulta) {
+        if (valorConsulta < 0) {
+            throw new IllegalArgumentException("Valor da consulta nao pode ser negativo.");
+        }
         this.valorConsulta = valorConsulta;
     }
 
@@ -93,6 +105,7 @@ public abstract class Profissional extends Pessoa {
     }
 
     public static boolean especialidadeValida(String esp) {
+        if (esp == null) return false;
         if (esp.equals("clinica geral")) return true;
         if (esp.equals("fisioterapia")) return true;
         if (esp.equals("psicologia")) return true;

@@ -12,6 +12,9 @@ public class HorarioDisponivel {
     }
 
     public void setDiaSemana(String diaSemana) {
+        if (diaSemana == null || diaSemana.trim().isEmpty()) {
+            throw new IllegalArgumentException("Dia da semana nao pode ser vazio.");
+        }
         this.diaSemana = diaSemana;
     }
 
@@ -20,6 +23,9 @@ public class HorarioDisponivel {
     }
 
     public void setTurno(String turno) {
+        if (turno == null || turno.trim().isEmpty()) {
+            throw new IllegalArgumentException("Turno nao pode ser vazio.");
+        }
         this.turno = turno;
     }
 

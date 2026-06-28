@@ -213,23 +213,31 @@ public class Main {
         int tipo = Integer.parseInt(sc.nextLine());
         boolean cadastrado;
 
-        if (tipo == 1) {
-            cadastrado = servico.cadastrarProfissional(nome, esp);
-        } else if (tipo == 2) {
-            System.out.print("Registro: ");
-            String reg = sc.nextLine();
-            System.out.print("Valor consulta: ");
-            double valor = Double.parseDouble(sc.nextLine());
-            String dadoEspecifico = lerDadoEspecificoProfissional(esp);
-            cadastrado = servico.cadastrarProfissional(nome, esp, reg, valor, dadoEspecifico);
-        } else {
-            System.out.print("Registro: ");
-            String reg = sc.nextLine();
-            System.out.print("Valor consulta: ");
-            double valor = Double.parseDouble(sc.nextLine());
-            String dadoEspecifico = lerDadoEspecificoProfissional(esp);
-            ArrayList<HorarioDisponivel> horarios = lerHorariosProfissional();
-            cadastrado = servico.cadastrarProfissional(nome, esp, reg, valor, horarios, dadoEspecifico);
+        try {
+            if (tipo == 1) {
+                cadastrado = servico.cadastrarProfissional(nome, esp);
+            } else if (tipo == 2) {
+                System.out.print("Registro: ");
+                String reg = sc.nextLine();
+                System.out.print("Valor consulta: ");
+                double valor = Double.parseDouble(sc.nextLine());
+                String dadoEspecifico = lerDadoEspecificoProfissional(esp);
+                cadastrado = servico.cadastrarProfissional(nome, esp, reg, valor, dadoEspecifico);
+            } else {
+                System.out.print("Registro: ");
+                String reg = sc.nextLine();
+                System.out.print("Valor consulta: ");
+                double valor = Double.parseDouble(sc.nextLine());
+                String dadoEspecifico = lerDadoEspecificoProfissional(esp);
+                ArrayList<HorarioDisponivel> horarios = lerHorariosProfissional();
+                cadastrado = servico.cadastrarProfissional(nome, esp, reg, valor, horarios, dadoEspecifico);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Informe um numero valido.");
+            return;
+        } catch (OperacaoInvalidaException | IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
         }
 
         if (!cadastrado) {
@@ -252,11 +260,19 @@ public class Main {
         double valor = Double.parseDouble(sc.nextLine());
         boolean atualizado;
 
-        if (tipo == 1) {
-            atualizado = servico.atualizarProfissional(nome, reg, valor);
-        } else {
-            ArrayList<HorarioDisponivel> horarios = lerHorariosProfissional();
-            atualizado = servico.atualizarProfissional(nome, reg, valor, horarios);
+        try {
+            if (tipo == 1) {
+                atualizado = servico.atualizarProfissional(nome, reg, valor);
+            } else {
+                ArrayList<HorarioDisponivel> horarios = lerHorariosProfissional();
+                atualizado = servico.atualizarProfissional(nome, reg, valor, horarios);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Informe um numero valido.");
+            return;
+        } catch (ProfissionalNaoEncontradoException | OperacaoInvalidaException | IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
         }
 
         if (!atualizado) {
@@ -368,9 +384,11 @@ public class Main {
 
         System.out.print("Nome do profissional: ");
         String nomeProf = sc.nextLine();
-        Profissional profissional = servico.buscarProfissionalPorNome(nomeProf);
-        if (profissional == null) {
-            System.out.println("Profissional nao encontrado.");
+        Profissional profissional;
+        try {
+            profissional = servico.buscarProfissionalPorNome(nomeProf);
+        } catch (ProfissionalNaoEncontradoException e) {
+            System.out.println(e.getMessage());
             return;
         }
         if (profissional.getValorConsulta() == 0) {
@@ -561,9 +579,11 @@ public class Main {
         }
 
         String nomeProf = consultas[idx].nomeProfissional;
-        Profissional profissional = servico.buscarProfissionalPorNome(nomeProf);
-        if (profissional == null) {
-            System.out.println("Profissional nao encontrado.");
+        Profissional profissional;
+        try {
+            profissional = servico.buscarProfissionalPorNome(nomeProf);
+        } catch (ProfissionalNaoEncontradoException e) {
+            System.out.println(e.getMessage());
             return;
         }
 
@@ -797,9 +817,11 @@ public class Main {
         }
 
         String nomeProf = consultas[idxConsulta].nomeProfissional;
-        Profissional profissional = servico.buscarProfissionalPorNome(nomeProf);
-        if (profissional == null) {
-            System.out.println("Profissional nao encontrado.");
+        Profissional profissional;
+        try {
+            profissional = servico.buscarProfissionalPorNome(nomeProf);
+        } catch (ProfissionalNaoEncontradoException e) {
+            System.out.println(e.getMessage());
             return;
         }
         double valorBase = profissional.getValorConsulta();

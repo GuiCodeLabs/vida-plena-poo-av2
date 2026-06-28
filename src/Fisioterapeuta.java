@@ -19,6 +19,9 @@ public class Fisioterapeuta extends Profissional {
     }
 
     public void setTotalSessoesPrevistas(int totalSessoesPrevistas) {
+        if (totalSessoesPrevistas < 0) {
+            throw new IllegalArgumentException("Total de sessoes nao pode ser negativo.");
+        }
         this.totalSessoesPrevistas = totalSessoesPrevistas;
     }
 

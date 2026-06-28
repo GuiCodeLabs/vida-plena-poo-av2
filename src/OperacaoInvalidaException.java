@@ -1,6 +1,3 @@
-/**
- * Exceção personalizada para tratar operações inconsistentes no fluxo do sistema.
- */
 public class OperacaoInvalidaException extends Exception {
     public OperacaoInvalidaException(String mensagem) {
         super(mensagem);
