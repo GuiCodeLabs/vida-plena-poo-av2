@@ -13,19 +13,20 @@ public class ClinicaServico {
         cpfsCadastrados = new HashSet<String>();
     }
 
-    public void cadastrarPaciente(Paciente paciente) {
+    public boolean cadastrarPaciente(Paciente paciente) {
         if (paciente == null) {
-            return;
+            return false;
         }
 
         String cpf = normalizarCpf(paciente.getCpf());
         if (cpf.equals("") || cpfsCadastrados.contains(cpf)) {
-            return;
+            return false;
         }
 
         pacientes.add(paciente);
         pacientesPorCpf.put(cpf, paciente);
         cpfsCadastrados.add(cpf);
+        return true;
     }
 
     public Paciente buscarPacientePorCpf(String cpf) {

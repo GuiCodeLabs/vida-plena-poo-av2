@@ -102,7 +102,7 @@ public class Main {
             System.out.print("Telefone: ");
             String tel = sc.nextLine();
             paciente = new Paciente(nome, cpf, idade, tel);
-        } else {
+        } else if (tipo == 3) {
             System.out.print("Idade: ");
             int idade = Integer.parseInt(sc.nextLine());
             System.out.print("Telefone: ");
@@ -110,10 +110,16 @@ public class Main {
             System.out.print("Convenio: ");
             String conv = sc.nextLine();
             paciente = new Paciente(nome, cpf, idade, tel, conv);
+        } else {
+            System.out.println("Tipo de cadastro invalido.");
+            return;
         }
-        servico.cadastrarPaciente(paciente);
-        sincronizarPacientes();
-        System.out.println("Paciente cadastrado com sucesso!");
+        if (servico.cadastrarPaciente(paciente)) {
+            sincronizarPacientes();
+            System.out.println("Paciente cadastrado com sucesso!");
+        } else {
+            System.out.println("Nao foi possivel cadastrar paciente.");
+        }
     }
 
     public static void complementarPaciente() {
