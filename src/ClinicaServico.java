@@ -599,15 +599,31 @@ public class ClinicaServico {
         throw new ConsultaNaoEncontradaException("Consulta não encontrada.");
     }
 
+    private void validarConsultaParaAtendimento(Consulta consulta) throws OperacaoInvalidaException {
+        if (consulta == null) {
+            throw new OperacaoInvalidaException("Consulta inválida.");
+        }
+        if (consulta.status.equals("cancelada")) {
+            throw new OperacaoInvalidaException("Não é possível registrar atendimento para uma consulta cancelada.");
+        }
+        if (consulta.status.equals("remarcada")) {
+            throw new OperacaoInvalidaException("Não é possível registrar atendimento para uma consulta remarcada. Use a nova consulta criada.");
+        }
+        if (consulta.status.equals("realizada")) {
+            throw new OperacaoInvalidaException("Não é possível registrar atendimento para uma consulta já concluída.");
+        }
+        if (!consulta.status.equals("agendada")) {
+            throw new OperacaoInvalidaException("Não é possível registrar atendimento para esta consulta.");
+        }
+    }
+
     public Atendimento registrarAtendimento(
             Consulta consulta,
             String observacoes,
             String diagnostico,
             String procedimentoInicial
-    ) {
-        if (consulta == null) {
-            return null;
-        }
+    ) throws OperacaoInvalidaException {
+        validarConsultaParaAtendimento(consulta);
 
         Atendimento atendimento = new Atendimento(consulta, observacoes, diagnostico);
         atendimento.registrarDadosClinicos(observacoes, diagnostico);
@@ -626,9 +642,24 @@ public class ClinicaServico {
             Consulta consulta,
             String observacoes,
             String diagnostico,
+            String[] procedimentos
+    ) throws OperacaoInvalidaException {
+        validarConsultaParaAtendimento(consulta);
+
+        Atendimento atendimento = new Atendimento(consulta, observacoes, diagnostico, procedimentos, procedimentos == null ? 0 : procedimentos.length);
+        atendimento.registrarDadosClinicos(observacoes, diagnostico);
+        atendimento.finalizarAtendimento();
+        atendimentos.add(atendimento);
+        return atendimento;
+    }
+
+    public Atendimento registrarAtendimento(
+            Consulta consulta,
+            String observacoes,
+            String diagnostico,
             String procedimentoInicial,
             String registroEspecifico
-    ) {
+    ) throws OperacaoInvalidaException {
         Atendimento atendimento = registrarAtendimento(consulta, observacoes, diagnostico, procedimentoInicial);
 
         if (atendimento != null) {

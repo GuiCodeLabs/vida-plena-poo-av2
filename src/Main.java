@@ -731,158 +731,298 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
     // ---- ATENDIMENTOS ----
 
     public static void menuAtendimentos() {
-        int op = -1;
-        while (op != 0) {
-            System.out.println("\n--- MENU DE ATENDIMENTOS ---");
-            System.out.println("1 - Registrar atendimento de consulta");
+        Integer op = -1;
+        while (op.intValue() != 0) {
+            System.out.println("\n=== ATENDIMENTOS ===");
+            System.out.println("1 - Registrar atendimento de uma consulta agendada");
+            System.out.println("2 - Listar atendimentos realizados");
+            System.out.println("3 - Buscar atendimento por CPF do paciente");
             System.out.println("0 - Voltar ao menu principal");
             op = lerInteiro("Escolha uma opcao: ");
-
-            if (op == 1) registrarAtendimento();
-        }
-    }
-
-    public static void registrarAtendimento() {
-        System.out.print("Indice da consulta: ");
-        int idxConsulta = Integer.parseInt(sc.nextLine());
-
-        if (idxConsulta < 0 || idxConsulta >= consultas.size()) {
-            System.out.println("Indice invalido.");
-            return;
-        }
-        if (!consultas.get(idxConsulta).status.equals("agendada")) {
-            System.out.println("So pode registrar atendimento em consulta agendada.");
-            return;
-        }
-
-        System.out.print("Observacoes: ");
-        String obs = sc.nextLine();
-
-        System.out.print("Tipo de registro (1-So obs / 2-Com diagnostico / 3-Completo): ");
-        int tipo = Integer.parseInt(sc.nextLine());
-
-        if (tipo == 1) {
-            atendimentos[totalAtendimentos] = new Atendimento(idxConsulta, obs);
-
-        } else if (tipo == 2) {
-            System.out.print("Diagnostico: ");
-            String diag = sc.nextLine();
-            atendimentos[totalAtendimentos] = new Atendimento(idxConsulta, obs, diag);
-
-        } else {
-            System.out.print("Diagnostico: ");
-            String diag = sc.nextLine();
-
-            System.out.print("Como informar procedimentos? (1-Um por vez / 2-Todos de uma vez): ");
-            int forma = Integer.parseInt(sc.nextLine());
-
-            String[] procs = new String[10];
-            int qtdProcs = 0;
-
-            if (forma == 1) {
-                String proc = "";
-                while (!proc.equals("fim") && qtdProcs < 10) {
-                    System.out.print("Procedimento (ou 'fim'): ");
-                    proc = sc.nextLine();
-                    if (!proc.equals("fim")) {
-                        procs[qtdProcs] = proc;
-                        qtdProcs++;
-                    }
-                }
-            } else {
-                System.out.print("Quantos? ");
-                qtdProcs = Integer.parseInt(sc.nextLine());
-                if (qtdProcs > 10) qtdProcs = 10;
-                for (int i = 0; i < qtdProcs; i++) {
-                    System.out.print("Proc " + (i+1) + ": ");
-                    procs[i] = sc.nextLine();
-                }
+            if (op == null) {
+                op = -1;
+                continue;
             }
-            atendimentos[totalAtendimentos] = new Atendimento(idxConsulta, obs, diag, procs, qtdProcs);
-        }
 
-        consultas.get(idxConsulta).realizar();
-        totalAtendimentos++;
-        System.out.println("\n--- RESUMO ---");
-        System.out.println(atendimentos[totalAtendimentos - 1].exibirResumo());
-        System.out.println("Consulta marcada como realizada.");
-    }
-
-    // ---- PAGAMENTOS ----
-
-    public static void menuPagamentos() {
-        int op = -1;
-        while (op != 0) {
-            System.out.println("\n--- MENU DE PAGAMENTOS ---");
-            System.out.println("1 - Registrar pagamento direto");
-            System.out.println("2 - Registrar pagamento automatico");
-            System.out.println("3 - Listar pagamentos registrados");
-            System.out.println("0 - Voltar ao menu principal");
-            op = lerInteiro("Escolha uma opcao: ");
-
-            switch (op) {
-                case 1: pagamentoDireto(); break;
-                case 2: pagamentoAutomatico(); break;
-                case 3: listarPagamentos(); break;
+            switch (op.intValue()) {
+                case 1: registrarAtendimento(); break;
+                case 2: listarAtendimentos(); break;
+                case 3: buscarAtendimentosPorPaciente(); break;
                 case 0: break;
                 default: System.out.println("Opcao invalida!"); break;
             }
         }
     }
 
-    public static void pagamentoDireto() {
-        System.out.print("Indice da consulta: ");
-        int idxConsulta = Integer.parseInt(sc.nextLine());
+    public static void registrarAtendimento() {
+        System.out.println("\n--- Registrar atendimento ---");
+        System.out.println("Um atendimento só pode ser registrado para uma consulta já agendada.");
+        System.out.println("Após o atendimento, a consulta será marcada como concluída.");
+        System.out.println("Será criado um prontuário com observações, diagnóstico e procedimentos.\n");
 
-        if (idxConsulta < 0 || idxConsulta >= consultas.size()) {
-            System.out.println("Indice invalido.");
+        if (consultas.isEmpty()) {
+            System.out.println("Nenhuma consulta cadastrada. Agende uma consulta antes de registrar atendimento.");
             return;
         }
 
-        System.out.print("Valor: ");
-        double valor = Double.parseDouble(sc.nextLine());
-        System.out.print("Tipo (dinheiro/cartao/convenio): ");
-        String tipoPag = sc.nextLine();
+        ArrayList<Integer> consultasAgendadas = new ArrayList<Integer>();
+        for (int i = 0; i < consultas.size(); i++) {
+            Consulta consulta = consultas.get(i);
+            if (consulta.status.equals("agendada")) {
+                consultasAgendadas.add(i);
+                System.out.println("[" + (consultasAgendadas.size()) + "] " + consulta.exibirResumo());
+            }
+        }
 
-        if (tipoPag.equals("cartao")) {
-            System.out.print("Parcelas (1 a 6): ");
-            int parc = Integer.parseInt(sc.nextLine());
-            try {
-                pagamentos[totalPagamentos] = new PagamentoCartao(idxConsulta, valor, tipoPag, parc);
-                if (parc > 1) {
-                    double vlrFinalCartao = pagamentos[totalPagamentos].getValorFinal();
-                    double vlrParc = Math.round((vlrFinalCartao / parc) * 100.0) / 100.0;
-                    System.out.println("Pagamento em " + parc + "x de R$" + vlrParc);
+        if (consultasAgendadas.isEmpty()) {
+            System.out.println("Não há consultas agendadas disponíveis para atendimento.");
+            return;
+        }
+
+        System.out.print("Informe o número da consulta que deseja atender: ");
+        int opcaoConsulta;
+        try {
+            opcaoConsulta = Integer.parseInt(sc.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Não foi possível registrar o atendimento: informe um número de consulta válido.");
+            return;
+        }
+
+        if (opcaoConsulta < 1 || opcaoConsulta > consultasAgendadas.size()) {
+            System.out.println("Não foi possível registrar o atendimento: informe um número de consulta válido.");
+            return;
+        }
+
+        int idxConsulta = consultasAgendadas.get(opcaoConsulta - 1);
+        Consulta consulta = consultas.get(idxConsulta);
+        System.out.println("\nConsulta selecionada para atendimento:");
+        System.out.println(consulta.exibirResumo());
+
+        int idxProfissional = buscarIndiceProfissional(consulta.nomeProfissional);
+        String registroEspecifico = "";
+        if (idxProfissional != -1) {
+            Profissional profissional = profissionais[idxProfissional];
+            System.out.println("Profissional selecionado: " + profissional.exibirResumo());
+            String especialidade = profissional.getEspecialidade();
+
+            if (especialidade.equals("nutricao")) {
+                System.out.println("Nota: nutricionista registra plano alimentar ou orientação nutricional.");
+            } else if (especialidade.equals("psicologia")) {
+                System.out.println("Nota: psicólogo registra abordagem terapêutica ou observação emocional.");
+            } else if (especialidade.equals("fisioterapia")) {
+                System.out.println("Nota: fisioterapeuta registra sessões, exercícios ou conduta física.");
+            } else if (especialidade.equals("clinica geral")) {
+                System.out.println("Nota: clínico geral pode registrar encaminhamento ou orientação médica.");
+            }
+        }
+
+        System.out.println("\nObservações clínicas:");
+        System.out.print("Informe observações clínicas gerais do atendimento. Exemplo: paciente relatou dor há 3 dias.\n> ");
+        String obs = sc.nextLine().trim();
+
+        System.out.println("\nDiagnóstico:");
+        System.out.print("Informe o diagnóstico ou hipótese diagnóstica. Exemplo: dor lombar, ansiedade, reeducação alimentar.\n> ");
+        String diag = sc.nextLine().trim();
+
+        System.out.print("\nQuantos procedimentos deseja registrar? (0 a 10): ");
+        int totalProcedimentos;
+        try {
+            totalProcedimentos = Integer.parseInt(sc.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Não foi possível registrar o atendimento: informe um número válido de procedimentos.");
+            return;
+        }
+
+        if (totalProcedimentos < 0) {
+            totalProcedimentos = 0;
+        }
+        if (totalProcedimentos > 10) {
+            totalProcedimentos = 10;
+        }
+
+        String[] procedimentos = new String[totalProcedimentos];
+        for (int i = 0; i < totalProcedimentos; i++) {
+            System.out.print("Procedimento " + (i + 1) + ": ");
+            procedimentos[i] = sc.nextLine().trim();
+        }
+
+        System.out.print("Registro específico opcional (pressione Enter para pular): ");
+        registroEspecifico = sc.nextLine().trim();
+
+        try {
+            Atendimento atendimento = servico.registrarAtendimento(consulta, obs, diag, procedimentos);
+            if (!registroEspecifico.equals("")) {
+                atendimento.setRegistroEspecifico(registroEspecifico);
+            }
+            atendimentos[totalAtendimentos] = atendimento;
+            totalAtendimentos++;
+
+            System.out.println("\nAtendimento registrado com sucesso!");
+            System.out.println("Consulta marcada como concluída.");
+            System.out.println("Prontuário criado para este atendimento.");
+            System.out.println("\n--- Resumo do atendimento ---");
+            System.out.println(atendimento.exibirResumo());
+        } catch (OperacaoInvalidaException e) {
+            System.out.println("Não foi possível registrar o atendimento: " + e.getMessage());
+        }
+    }
+
+    public static void listarAtendimentos() {
+        if (totalAtendimentos == 0) {
+            System.out.println("Nenhum atendimento registrado.");
+            return;
+        }
+
+        System.out.println("\nAtendimentos realizados:");
+        for (int i = 0; i < totalAtendimentos; i++) {
+            System.out.println("[" + i + "] " + atendimentos[i].exibirResumo());
+        }
+    }
+
+    public static void buscarAtendimentosPorPaciente() {
+        System.out.print("Informe o CPF do paciente para buscar atendimentos: ");
+        String cpf = sc.nextLine().trim();
+
+        boolean achou = false;
+        for (int i = 0; i < totalAtendimentos; i++) {
+            Atendimento atendimento = atendimentos[i];
+            Consulta consulta = atendimento.getConsulta();
+            if (consulta != null && consulta.cpfPaciente.equals(cpf)) {
+                if (!achou) {
+                    System.out.println("\nAtendimentos encontrados para CPF " + cpf + ":");
                 }
-                totalPagamentos++;
-                System.out.println("Pagamento registrado!");
-            } catch (PagamentoInvalidoException e) {
-                System.out.println("Erro no pagamento: " + e.getMessage());
+                System.out.println("[" + i + "] " + atendimento.exibirResumo());
+                achou = true;
             }
-        } else if (tipoPag.equals("convenio")) {
-            System.out.print("Nome do convenio: ");
-            String nomeConvenio = sc.nextLine();
-            Convenio convenio = buscarConvenioPorNome(nomeConvenio);
+        }
 
-            String nomeProfConsulta = consultas.get(idxConsulta).nomeProfissional;
-            int idxProfConsulta = buscarIndiceProfissional(nomeProfConsulta);
-            String especialidade = profissionais[idxProfConsulta].getEspecialidade();
+        if (!achou) {
+            System.out.println("Nenhum atendimento encontrado para o CPF informado.");
+        }
+    }
 
-            try {
-                pagamentos[totalPagamentos] = new PagamentoConvenio(idxConsulta, valor, tipoPag, convenio, especialidade);
-                totalPagamentos++;
-                System.out.println("Pagamento registrado!");
-            } catch (ConvenioNaoCobreException e) {
-                System.out.println("Erro no pagamento: " + e.getMessage());
+    // ---- PAGAMENTOS ----
+
+    public static void menuPagamentos() {
+        Integer op = -1;
+        while (op.intValue() != 0) {
+            System.out.println("\n=== PAGAMENTOS ===");
+            System.out.println("1 - Registrar pagamento direto");
+            System.out.println("2 - Registrar pagamento automatico");
+            System.out.println("3 - Listar pagamentos registrados");
+            System.out.println("4 - Buscar pagamentos por CPF do paciente");
+            System.out.println("5 - Exibir resumo financeiro");
+            System.out.println("0 - Voltar ao menu principal");
+            op = lerInteiro("Escolha uma opcao: ");
+            if (op == null) { op = -1; continue; }
+
+            switch (op.intValue()) {
+                case 1: pagamentoDireto(); break;
+                case 2: pagamentoAutomatico(); break;
+                case 3: listarPagamentos(); break;
+                case 4: buscarPagamentosPorPaciente(); break;
+                case 5: Relatorio.gerarResumoFinanceiro(consultasComoArray(), consultas.size(), pagamentos, totalPagamentos, multas, totalMultas); break;
+                case 0: break;
+                default: System.out.println("Opcao invalida!"); break;
             }
-        } else {
-            pagamentos[totalPagamentos] = new PagamentoDinheiro(idxConsulta, valor, tipoPag);
+
+        }
+    }
+
+    public static void pagamentoDireto() {
+        System.out.println("\n--- Registrar pagamento direto ---");
+        System.out.println("Um pagamento só pode ser registrado para uma consulta / atendimento já realizado.");
+
+        // lista consultas realizadas disponíveis
+        ArrayList<Integer> consultasRealizadas = new ArrayList<Integer>();
+        for (int i = 0; i < consultas.size(); i++) {
+            Consulta c = consultas.get(i);
+            if (c.status.equals("realizada")) {
+                consultasRealizadas.add(i);
+                int idx = consultasRealizadas.size();
+                int idxProf = buscarIndiceProfissional(c.nomeProfissional);
+                double valorBase = (idxProf >= 0) ? profissionais[idxProf].getValorConsulta() : 0;
+                System.out.println("[" + idx + "] " + c.exibirResumo() + " | Valor base: R$" + valorBase);
+            }
+        }
+
+        if (consultasRealizadas.isEmpty()) {
+            System.out.println("Nenhum atendimento concluído disponível para pagamento.");
+            return;
+        }
+
+        System.out.print("Informe o número do atendimento/consulta que deseja pagar: ");
+        int opc;
+        try {
+            opc = Integer.parseInt(sc.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Não foi possível registrar o pagamento: informe um número de atendimento válido.");
+            return;
+        }
+        if (opc < 1 || opc > consultasRealizadas.size()) {
+            System.out.println("Não foi possível registrar o pagamento: número de atendimento inválido.");
+            return;
+        }
+
+        int idxConsulta = consultasRealizadas.get(opc - 1);
+        Consulta consulta = consultas.get(idxConsulta);
+        int idxProf = buscarIndiceProfissional(consulta.nomeProfissional);
+        double valorBase = (idxProf >= 0) ? profissionais[idxProf].getValorConsulta() : 0;
+
+        System.out.println("\nConsulta selecionada: " + consulta.exibirResumo());
+        System.out.println("Valor base: R$" + valorBase);
+
+        System.out.println("\nFormas de pagamento:");
+        System.out.println("1 - Dinheiro/Pix (5% de desconto)");
+        System.out.println("2 - Cartão (parcelas de 1 a 6; taxa 2,5% por parcela acima de 3)");
+        System.out.println("3 - Convênio (aplica cobertura do convênio do paciente)");
+        System.out.print("Escolha a forma de pagamento (1/2/3): ");
+        String escolha = sc.nextLine().trim();
+
+        try {
+            if (escolha.equals("2")) {
+                System.out.print("Parcelas (1 a 6): ");
+                int parc = Integer.parseInt(sc.nextLine());
+                pagamentos[totalPagamentos] = new PagamentoCartao(idxConsulta, valorBase, "cartao", parc);
+                double vlrFinal = pagamentos[totalPagamentos].getValorFinal();
+                double vlrParc = Math.round((vlrFinal / parc) * 100.0) / 100.0;
+                System.out.println("Parcelas: " + parc + " | Valor final: R$" + vlrFinal + " (R$" + vlrParc + " cada)");
+            } else if (escolha.equals("3")) {
+                System.out.print("Nome do convênio (deixe vazio para usar convênio do cadastro): ");
+                String nomeConvenio = sc.nextLine().trim();
+                Convenio convenio = null;
+                if (nomeConvenio.equals("")) {
+                    try {
+                        convenio = servico.buscarPacientePorCpf(consulta.cpfPaciente).getConvenio();
+                    } catch (PacienteNaoEncontradoException e) {
+                        System.out.println("Não foi possível registrar o pagamento: " + e.getMessage());
+                        return;
+                    }
+                } else {
+                    convenio = buscarConvenioPorNome(nomeConvenio);
+                }
+                pagamentos[totalPagamentos] = new PagamentoConvenio(idxConsulta, valorBase, "convenio", convenio, profissionais[idxProf].getEspecialidade());
+                double vlrFinalC = pagamentos[totalPagamentos].getValorFinal();
+                System.out.println("Convênio aplicado: " + ((PagamentoConvenio)pagamentos[totalPagamentos]).getNomeConvenio());
+                System.out.println("Valor final: R$" + Math.round(vlrFinalC * 100.0) / 100.0);
+            } else {
+                pagamentos[totalPagamentos] = new PagamentoDinheiro(idxConsulta, valorBase, "dinheiro");
+                double vlrFinalD = pagamentos[totalPagamentos].getValorFinal();
+                System.out.println("Dinheiro/Pix selecionado. Valor final com desconto: R$" + Math.round(vlrFinalD * 100.0) / 100.0);
+            }
             totalPagamentos++;
-            System.out.println("Pagamento registrado!");
+            System.out.println("Pagamento registrado com sucesso!");
+        } catch (PagamentoInvalidoException e) {
+            System.out.println("Não foi possível registrar o pagamento: " + e.getMessage());
+        } catch (ConvenioNaoCobreException e) {
+            System.out.println("Não foi possível registrar o pagamento: " + e.getMessage());
         }
     }
 
     public static void pagamentoAutomatico() {
+        System.out.println("\n--- Registrar pagamento automático ---");
+        System.out.println("Fluxo automático: calcula descontos de retorno/convênio e multa antes de aplicar a forma de pagamento.");
+
         System.out.print("Indice da consulta: ");
         int idxConsulta = Integer.parseInt(sc.nextLine());
 
@@ -891,21 +1031,25 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
             return;
         }
 
-        // obtem valor do profissional
-        String nomeProf = consultas.get(idxConsulta).nomeProfissional;
-        int idxProf = buscarIndiceProfissional(nomeProf);
-        double valorBase = profissionais[idxProf].getValorConsulta();
+        Consulta c = consultas.get(idxConsulta);
+        if (!c.status.equals("realizada")) {
+            System.out.println("Não é possível registrar pagamento: a consulta ainda não foi concluída.");
+            return;
+        }
 
-        // verifica convenio e tipo
-        String cpfPac = consultas.get(idxConsulta).cpfPaciente;
+        String nomeProf = c.nomeProfissional;
+        int idxProf = buscarIndiceProfissional(nomeProf);
+        double valorBase = (idxProf >= 0) ? profissionais[idxProf].getValorConsulta() : 0;
+
+        String cpfPac = c.cpfPaciente;
         boolean temConvenio;
         try {
             temConvenio = servico.pacienteTemConvenio(cpfPac);
         } catch (PacienteNaoEncontradoException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Não foi possível registrar o pagamento: " + e.getMessage());
             return;
         }
-        boolean ehRetorno = consultas.get(idxConsulta).tipo.equals("retorno");
+        boolean ehRetorno = c.tipo.equals("retorno");
 
         double desconto = 0;
         if (ehRetorno) desconto = desconto + 20;
@@ -927,47 +1071,46 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
         if (valorFinal < 0) valorFinal = 0;
 
         System.out.println("Valor base: R$" + valorBase);
-        System.out.println("Desconto: " + desconto + "%");
+        System.out.println("Desconto aplicado (retorno/convênio): " + desconto + "%");
         if (valorMulta > 0) System.out.println("Multa: R$" + valorMulta);
         double vlrFinalArredondado = Math.round(valorFinal * 100.0) / 100.0;
-        System.out.println("Valor final: R$" + vlrFinalArredondado);
+        System.out.println("Valor final antes da forma de pagamento: R$" + vlrFinalArredondado);
 
-        System.out.print("Tipo (dinheiro/cartao/convenio): ");
-        String tipoPag = sc.nextLine();
+        System.out.println("\nFormas de pagamento:\n1-Dinheiro/Pix (5% desconto)\n2-Cartão (1-6 parcelas; taxa 2.5% por parcela acima de 3)\n3-Convênio (aplica cobertura)");
+        System.out.print("Escolha a forma de pagamento (1/2/3): ");
+        String escolha = sc.nextLine().trim();
 
-        if (tipoPag.equals("cartao")) {
-            System.out.print("Parcelas (1 a 6): ");
-            int parc = Integer.parseInt(sc.nextLine());
-            try {
-                pagamentos[totalPagamentos] = new PagamentoCartao(idxConsulta, valorFinal, tipoPag, parc, true);
+        try {
+            if (escolha.equals("2")) {
+                System.out.print("Parcelas (1 a 6): ");
+                int parc = Integer.parseInt(sc.nextLine());
+                pagamentos[totalPagamentos] = new PagamentoCartao(idxConsulta, valorFinal, "cartao", parc, true);
                 double vlrParc = Math.round((valorFinal / parc) * 100.0) / 100.0;
                 System.out.println("Pagamento em " + parc + "x de R$" + vlrParc);
                 totalPagamentos++;
                 System.out.println("Pagamento registrado!");
-            } catch (PagamentoInvalidoException e) {
-                System.out.println("Erro no pagamento: " + e.getMessage());
-            }
-        } else if (tipoPag.equals("convenio")) {
-            Convenio convenio = null;
-        try {
-            convenio = servico.buscarPacientePorCpf(cpfPac).getConvenio();
-        }   catch (PacienteNaoEncontradoException e) {
-                System.out.println(e.getMessage());
-            return;
-        }
-            String especialidade = profissionais[idxProf].getEspecialidade();
+            } else if (escolha.equals("3")) {
+                Convenio convenio = null;
+                try {
+                    convenio = servico.buscarPacientePorCpf(cpfPac).getConvenio();
+                } catch (PacienteNaoEncontradoException e) {
+                    System.out.println("Não foi possível registrar o pagamento: " + e.getMessage());
+                    return;
+                }
+                String especialidade = profissionais[idxProf].getEspecialidade();
 
-            try {
-                pagamentos[totalPagamentos] = new PagamentoConvenio(idxConsulta, valorBase, tipoPag, convenio, especialidade);
+                pagamentos[totalPagamentos] = new PagamentoConvenio(idxConsulta, valorBase, "convenio", convenio, especialidade);
                 totalPagamentos++;
-                System.out.println("Pagamento registrado!");
-            } catch (ConvenioNaoCobreException e) {
-                System.out.println("Erro no pagamento: " + e.getMessage());
+                System.out.println("Pagamento registrado via convênio: " + convenio.getNome());
+            } else {
+                pagamentos[totalPagamentos] = new PagamentoDinheiro(idxConsulta, valorFinal, "dinheiro", true);
+                totalPagamentos++;
+                System.out.println("Pagamento registrado em dinheiro/pix. Valor final: R$" + Math.round(valorFinal * 100.0) / 100.0);
             }
-        } else {
-            pagamentos[totalPagamentos] = new PagamentoDinheiro(idxConsulta, valorFinal, tipoPag, true);
-            totalPagamentos++;
-            System.out.println("Pagamento registrado!");
+        } catch (PagamentoInvalidoException e) {
+            System.out.println("Não foi possível registrar o pagamento: " + e.getMessage());
+        } catch (ConvenioNaoCobreException e) {
+            System.out.println("Não foi possível registrar o pagamento: " + e.getMessage());
         }
     }
 
@@ -979,6 +1122,27 @@ public static boolean temConflito(String nomeProf, String data, String horario) 
         for (int i = 0; i < totalPagamentos; i++) {
             System.out.println(pagamentos[i].exibirResumo());
         }
+    }
+
+    public static void buscarPagamentosPorPaciente() {
+        System.out.print("Informe o CPF do paciente para buscar pagamentos: ");
+        String cpf = sc.nextLine().trim();
+
+        boolean achou = false;
+        for (int i = 0; i < totalPagamentos; i++) {
+            Pagamento p = pagamentos[i];
+            int idxConsulta = p.getIndiceConsulta();
+            if (idxConsulta >= 0 && idxConsulta < consultas.size()) {
+                Consulta c = consultas.get(idxConsulta);
+                if (c.cpfPaciente.equals(cpf)) {
+                    if (!achou) System.out.println("\nPagamentos encontrados para CPF " + cpf + ":");
+                    System.out.println("[" + i + "] " + p.exibirResumo());
+                    achou = true;
+                }
+            }
+        }
+
+        if (!achou) System.out.println("Nenhum pagamento encontrado para o CPF informado.");
     }
 
     public static Consulta[] consultasComoArray() {
